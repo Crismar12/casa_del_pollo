@@ -129,14 +129,6 @@ VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
 - PostCSS - Procesamiento de CSS
 - Autoprefixer - Prefijos automáticos de CSS
 
-## 📝 Licencia
-
-Proyecto privado - Todos los derechos reservados
-
-## 👥 Contribución
-
-Este es un proyecto privado. Para contribuir, contacta con el equipo de desarrollo.
-
 ---
 
-Desarrollado con ❤️ para La Casa de Pollo
+Desarrollado con ❤️ 
