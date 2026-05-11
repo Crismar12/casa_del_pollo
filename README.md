@@ -54,7 +54,9 @@ la-casa-de-pollo-gestor-pedidos/
 │   └── config/            # Configuraciones generales
 ├── backend/               # API backend
 │   └── src/
+├──db.sql                 # script de la base de datos
 └── public/               # Archivos estáticos
+
 ```
 
 ## 🚀 Instalación y Configuración
@@ -99,9 +101,68 @@ npm run dev
 Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
-VITE_SUPABASE_URL=tu_supabase_url
+VITE_SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
 VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
+VITE_BACKEND_API_URL=http://localhost:4000
+SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+SUPABASE_ANON_KEY=tu_supabase_anon_key
+PORT=4000
 ```
+
+Para el backend, también existe el archivo [`backend/.env.example`](backend/.env.example). La forma recomendada de usarlo es copiarlo a [`backend/.env`](backend/.env) y completar la `SUPABASE_SERVICE_ROLE_KEY`:
+
+```powershell
+Copy-Item backend\.env.example backend\.env
+```
+
+Si prefieres hacerlo a mano, asegúrate de que el backend tenga al menos estas variables:
+
+```env
+SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+PORT=4000
+```
+
+## ▶️ Cómo levantar la app
+
+1. Instala dependencias en la raíz:
+
+```bash
+npm install
+```
+
+2. Instala dependencias del backend:
+
+```bash
+cd backend
+npm install
+```
+
+3. Crea el archivo de entorno del backend desde el ejemplo:
+
+```powershell
+Copy-Item backend\.env.example backend\.env
+```
+
+4. Inicia el backend:
+
+```bash
+cd backend
+npm run dev
+```
+
+5. En otra terminal, inicia el frontend:
+
+```bash
+npm run dev
+```
+
+## 📝 Notas Importantes
+
+- El frontend usa las variables `VITE_*` del `.env` raíz.
+- El backend no debe usar la `SERVICE_ROLE_KEY` en variables `VITE_*`.
+- Si cambias el `.env`, reinicia el proceso correspondiente para que cargue los valores nuevos.
 
 ## 📄 Scripts Disponibles
 
