@@ -1,12 +1,8 @@
 import React from "react";
 
-type ButtonProps = {
-  children: React.ReactNode;
-  onClick?: () => void;
-  type?: "button" | "submit" | "reset";
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "info";
-  className?: string;
-  gradient?: boolean; 
+  gradient?: boolean;
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -15,7 +11,9 @@ export const Button: React.FC<ButtonProps> = ({
   type = "button",
   variant = "primary",
   className,
-  gradient = false, 
+  gradient = false,
+  disabled,
+  ...props
 }) => {
   const baseStyle =
     "px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300 ease-in-out sm:px-4 sm:py-2 sm:text-base";
@@ -32,7 +30,9 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`${baseStyle} ${gradient ? gradientStyles : variants[variant]} ${className || ""}`}
+      {...props}
     >
       {children}
     </button>

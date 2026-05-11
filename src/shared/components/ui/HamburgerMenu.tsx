@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { Menu, X } from 'lucide-react';
-import { Button } from '@/shared/components/ui/Button';
+import { Button } from './Button';
 
 interface HamburgerMenuProps {
   children: React.ReactNode;

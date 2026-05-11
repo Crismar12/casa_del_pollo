@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import type { ButtonHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../../lib/utils';
 
 export type ButtonVariant = 'default' | 'ghost' | 'outline' | 'secondary' | 'destructive' | 'link';
 export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';

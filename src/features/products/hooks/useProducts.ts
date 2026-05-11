@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getProductos } from "@/features/products/services/product.service";
-import type { Product } from "@/features/products/types/product.types";
+import { getProductos } from "../services/product.service";
+import type { Product } from "../types/product.types";
 
 const PLACEHOLDER_IMAGE_URL = "https://buenazo.cronosmedia.glr.pe/original/2020/08/30/5f4c2be6cce5112a0674ccc8.jpg";
 

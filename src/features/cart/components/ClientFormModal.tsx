@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Modal } from '@/features/admin/components/Modal'; 
-import { Input } from '@/shared/components/iu';
-import { Button } from '@/shared/components/iu';
-import { useNotificationContext } from '@/shared/context/NotificationContext';
-import { apiClient } from '@/shared/utils/apiClient';
+import { Modal } from '../../admin/components/Modal'; 
+import { Input } from '../../../shared/components/iu';
+import { Button } from '../../../shared/components/iu';
+import { useNotificationContext } from '../../../shared/context/NotificationContext';
+import { apiClient } from '../../../shared/utils/apiClient';
 
 interface BackendClient {
   idcliente: number;
@@ -80,7 +80,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
       onClose();
     } catch (error: unknown) {
       console.error('Error confirming client:', error);
-      showNotification(error.message || 'Error al confirmar cliente.', 'error');
+      showNotification(error instanceof Error ? error.message : 'Error al confirmar cliente.', 'error');
     } finally {
       setIsLoading(false);
     }

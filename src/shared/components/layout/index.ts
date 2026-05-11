@@ -1,2 +1,2 @@
-export { Header } from "./Header";
-export { Sidebar } from "./Sidebar";
+export { AppHeader as Header } from "./Header";
+export { AppSidebar as Sidebar } from "./Sidebar";

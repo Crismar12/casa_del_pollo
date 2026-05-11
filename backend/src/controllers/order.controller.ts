@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { orderService } from '@services/order.service';
-import { CreateOrderPayload } from '@backendTypes/order.types';
+import { orderService } from '../services/order.service';
+import { CreateOrderPayload } from '../types/order.types';
 
 export const orderController = {
   async createOrder(req: Request, res: Response): Promise<void> {

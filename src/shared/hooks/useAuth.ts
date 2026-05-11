@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { authService } from '@/features/auth/services/auth.service';
-import type { Usuario } from '@/shared/types/usuario.types';
+import { authService } from '../../features/auth/services/auth.service';
+import type { Usuario } from '../types/usuario.types';
 
 export const useAuth = () => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);

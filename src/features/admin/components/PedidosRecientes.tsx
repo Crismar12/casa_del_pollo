@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Modal } from './Modal';
-import { useOrders } from '@/features/orders/hooks/useOrders';
-import { ORDER_STATUS, type Order, type OrderStatus } from '@/features/orders/types/order.types';
-import { getOrderDetails } from '@/features/orders/services/order.service';
-import { Button } from '@/shared/components/iu';
-import { formatDateLocal, formatDateTimeLocal } from '@/shared/utils/dateUtils';
+import { useOrders } from '../../orders/hooks/useOrders';
+import { ORDER_STATUS, type Order, type OrderStatus } from '../../orders/types/order.types';
+import { getOrderDetails } from '../../orders/services/order.service';
+import { Button } from '../../../shared/components/iu';
+import { formatDateLocal, formatDateTimeLocal } from '../../../shared/utils/dateUtils';
 
 type PedidosRecientesProps = {
   title?: string;

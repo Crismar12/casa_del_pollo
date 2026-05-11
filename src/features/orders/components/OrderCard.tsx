@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { Order } from '@/features/orders/types';
-import { Card } from '@/shared/components/iu';
+import type { Order } from '../types';
+import { Card } from '../../../shared/components/iu';
 import { OrderTimeline } from './OrderTimeline';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { getOrderDetails } from '@/features/orders/services/order.service';
-import { formatDateTimeLocal } from '@/shared/utils/dateUtils';
+import { getOrderDetails } from '../services/order.service';
+import { formatDateTimeLocal } from '../../../shared/utils/dateUtils';
 
 interface OrderCardProps {
   order: Order;

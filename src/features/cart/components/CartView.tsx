@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "../hooks/useCart";
-import type { Product } from "@/features/products/types";
-import { createOrder } from '@/features/orders/services';
-import { useNotificationContext } from '@/shared/context/NotificationContext';
+import type { Product } from "../../products/types";
+import { createOrder } from '../../orders/services';
+import { useNotificationContext } from '../../../shared/context/NotificationContext';
 import { clearCart } from '../store/cartSlice';
 import { useDispatch } from 'react-redux';
 import { ClientFormModal } from './ClientFormModal'; 

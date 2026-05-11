@@ -1,9 +1,9 @@
-import { useOrders } from '@/features/orders/hooks/useOrders';
-import { OrderList } from '@/shared/components/OrderList';
+import { useOrders } from '../features/orders/hooks/useOrders';
+import { OrderList } from '../shared/components/OrderList';
 import React from 'react';
-import { ORDER_STATUS } from '@/features/orders/types';
-import type { OrderStatus } from '@/features/orders/types';
-import { Button } from '@/shared/components/iu';
+import { ORDER_STATUS } from '../features/orders/types';
+import type { OrderStatus } from '../features/orders/types';
+import { Button } from '../shared/components/iu';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const statusFilters: (OrderStatus | undefined)[] = [

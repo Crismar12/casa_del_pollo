@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { addProduct, removeProduct } from '../store/cartSlice';
-import type { RootState } from '@/store';
-import type { Product } from "@/features/products/types/product.types";
-import { useNotificationContext } from '@/shared/context/NotificationContext';
+import type { RootState } from '../../../store';
+import type { Product } from "../../products/types/product.types";
+import { useNotificationContext } from '../../../shared/context/NotificationContext';
 
 export const useCart = () => {
   const dispatch = useDispatch();

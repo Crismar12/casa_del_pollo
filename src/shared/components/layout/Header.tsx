@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu } from "lucide-react";
-import { Button } from "@/shared/components/iu";
+import { Button } from "../iu";
 import { useLocation } from "react-router-dom";
 
 

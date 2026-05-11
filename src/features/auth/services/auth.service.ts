@@ -1,5 +1,5 @@
-import { apiClient } from '@/shared/utils/apiClient';
-import type { Usuario } from '@/shared/types/usuario.types';
+import { apiClient } from '../../../shared/utils/apiClient';
+import type { Usuario } from '../../../shared/types/usuario.types';
 
 interface LoginCredentials {
   email: string;

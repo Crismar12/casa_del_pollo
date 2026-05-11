@@ -1,6 +1,6 @@
 import React from 'react';
-import type { Order } from '@/features/orders/types';
-import { OrderCard } from '@/features/orders/components/OrderCard';
+import type { Order } from '../../features/orders/types';
+import { OrderCard } from '../../features/orders/components/OrderCard';
 
 interface OrderListProps {
   orders: Order[];

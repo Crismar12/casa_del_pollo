@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { clientService } from '@services/client.service';
-import { CreateClientPayload } from '@backendTypes/client.types';
+import { clientService } from '../services/client.service';
+import { CreateClientPayload } from '../types/client.types';
 
 export const clientController = {
   async createClient(req: Request, res: Response): Promise<void> {

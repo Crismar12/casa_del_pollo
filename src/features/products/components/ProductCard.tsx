@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Product } from "@/features/products/types/product.types";
-import { Card } from '@/shared/components/iu';
-import { useCart } from '@/features/cart/hooks';
+import type { Product } from "../types/product.types";
+import { Card } from '../../../shared/components/iu';
+import { useCart } from '../../cart/hooks';
 import { Plus } from 'lucide-react';
 
 interface ProductCardProps {

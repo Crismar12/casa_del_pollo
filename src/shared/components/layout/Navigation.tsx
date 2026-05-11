@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, ShoppingCart, ClipboardList, UserCog, LogOut } from 'lucide-react';
 import { HamburgerMenu } from '../ui/HamburgerMenu';
-import { Button } from '@/shared/components/ui/Button';
+import { Button } from '../ui/Button';
 import { useAuth } from '../../../shared/hooks/useAuth';
 
 export const Navigation: React.FC = () => {

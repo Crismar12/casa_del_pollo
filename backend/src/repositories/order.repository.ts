@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { Pedido, DetallePedido } from '@backendTypes/order.types';
+import { supabase } from '../config/supabase';
+import { Pedido, DetallePedido } from '../types/order.types';
 
 interface CreatePedidoPayload {
   idcliente: number;

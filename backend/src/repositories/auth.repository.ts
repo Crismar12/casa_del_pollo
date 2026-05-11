@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { Usuario } from '@backendTypes/usuario.types';
+import { supabase } from '../config/supabase';
+import { Usuario } from '../types/usuario.types';
 
 export const authRepository = {
   async findByEmail(email: string): Promise<Usuario | null> {

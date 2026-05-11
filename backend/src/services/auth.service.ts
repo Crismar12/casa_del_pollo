@@ -1,5 +1,5 @@
-import { authRepository } from '@repositories/auth.repository';
-import { Usuario } from '@backendTypes/usuario.types';
+import { authRepository } from '../repositories/auth.repository';
+import { Usuario } from '../types/usuario.types';
 
 export const authService = {
   async verifyCredentials(email: string, contrasena: string): Promise<Usuario | null> {

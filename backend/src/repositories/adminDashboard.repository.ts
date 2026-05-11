@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { MostSoldProduct, DailySalesData } from '@backendTypes/adminDashboard.types';
+import { supabase } from '../config/supabase';
+import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {

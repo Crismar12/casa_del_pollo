@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { getOrders, updateOrderStatus } from "@/features/orders/services/order.service";
-import type { Order, OrderStatus } from "@/features/orders/types";
+import { getOrders, updateOrderStatus } from "../services/order.service";
+import type { Order, OrderStatus } from "../types";
 
 const ITEMS_PER_PAGE = 6; 
 

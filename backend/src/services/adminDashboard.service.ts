@@ -1,5 +1,5 @@
-import { adminDashboardRepository } from '@repositories/adminDashboard.repository';
-import { MostSoldProduct, DailySalesData } from '@backendTypes/adminDashboard.types';
+import { adminDashboardRepository } from '../repositories/adminDashboard.repository';
+import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
 export const adminDashboardService = {
   async getMostSoldProducts(): Promise<MostSoldProduct[]> {

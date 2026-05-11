@@ -5,9 +5,10 @@ type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  title?: string;
 };
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
   if (!isOpen) return null;
 
   return (
@@ -18,6 +19,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
             &times;
           </button>
         </div>
+        {title && <h3 className="mt-2 text-lg font-semibold text-gray-900">{title}</h3>}
         <div className="mt-4">
           {children}
         </div>

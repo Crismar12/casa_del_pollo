@@ -1,5 +1,5 @@
-import { apiClient } from '@/shared/utils/apiClient';
-import { type MostSoldProduct, type DailySalesData, type DashboardSummary } from '@/features/admin/types/admin.types';
+import { apiClient } from '../../../shared/utils/apiClient';
+import { type MostSoldProduct, type DailySalesData, type DashboardSummary } from '../types/admin.types';
 
 export const adminDashboardService = {
   async getMostSoldProducts(): Promise<MostSoldProduct[]> {

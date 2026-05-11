@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../shared/hooks/useNotification';
 import React from 'react';
-import { Input } from '@/shared/components/iu';
-import { Button } from '@/shared/components/iu';
-import { useAuth } from '@/shared/hooks/useAuth'; 
+import { Input } from '../shared/components/iu';
+import { Button } from '../shared/components/iu';
+import { useAuth } from '../shared/hooks/useAuth'; 
 
 export default function Login() {
   const [email, setEmail] = useState('');

@@ -5,12 +5,12 @@ import cors from 'cors';
 
 dotenv.config();
 
-import productRoutes from '@routes/product.routes';
-import categoryRoutes from '@routes/category.routes';
-import authRoutes from '@routes/auth.routes';
-import clientRoutes from '@routes/client.routes';
-import orderRoutes from '@routes/order.routes';
-import adminDashboardRoutes from '@routes/adminDashboard.routes';
+import productRoutes from './routes/product.routes';
+import categoryRoutes from './routes/category.routes';
+import authRoutes from './routes/auth.routes';
+import clientRoutes from './routes/client.routes';
+import orderRoutes from './routes/order.routes';
+import adminDashboardRoutes from './routes/adminDashboard.routes';
 
 const app = express();
 

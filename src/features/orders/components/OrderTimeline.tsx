@@ -1,6 +1,6 @@
 import React from 'react';
-import { ORDER_STATUS } from '@/features/orders/types';
-import type { OrderStatus } from '@/features/orders/types';
+import { ORDER_STATUS } from '../types';
+import type { OrderStatus } from '../types';
 
 interface OrderTimelineProps {
   currentStatus: OrderStatus;

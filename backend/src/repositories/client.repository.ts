@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { Client, CreateClientPayload } from '@backendTypes/client.types';
+import { supabase } from '../config/supabase';
+import { Client, CreateClientPayload } from '../types/client.types';
 
 export const clientRepository = {
   async createClient(clientData: CreateClientPayload): Promise<Client> {

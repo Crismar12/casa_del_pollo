@@ -1,5 +1,5 @@
 import type { Category } from "../types/category.types";
-import { apiClient } from "@/shared/utils/apiClient";
+import { apiClient } from "../../../shared/utils/apiClient";
 
 export const getCategories = async (): Promise<Category[]> => {
   try {

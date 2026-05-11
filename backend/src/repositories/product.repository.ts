@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { Product } from '@backendTypes/product.types';
+import { supabase } from '../config/supabase';
+import { Product } from '../types/product.types';
 
 export const productRepository = {
   async getAll(categoryId?: string): Promise<Product[]> {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { adminDashboardService } from '@services/adminDashboard.service';
+import { adminDashboardService } from '../services/adminDashboard.service';
 
 export const adminDashboardController = {
   async getMostSoldProducts(req: Request, res: Response): Promise<void> {

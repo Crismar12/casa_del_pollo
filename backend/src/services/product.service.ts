@@ -1,5 +1,5 @@
-import { Product } from '@backendTypes/product.types';
-import { productRepository } from '@repositories/product.repository';
+import { Product } from '../types/product.types';
+import { productRepository } from '../repositories/product.repository';
 
 export const productService = {
   async listAllProducts(categoryId?: string): Promise<Product[]> {

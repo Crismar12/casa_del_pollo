@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ProductList } from "../features/products/components/ProductList";
 import { useCategories } from "../features/products/hooks/useCategories";
-import { Button } from '@/shared/components/iu';
+import { Button } from '../shared/components/iu';
 
 export const ProductPage = () => {
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();

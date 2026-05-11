@@ -1,5 +1,5 @@
-import { Category } from '@backendTypes/category.types';
-import { categoryRepository } from '@repositories/category.repository';
+import { Category } from '../types/category.types';
+import { categoryRepository } from '../repositories/category.repository';
 
 export const categoryService = {
   async listAllCategories(): Promise<Category[]> {

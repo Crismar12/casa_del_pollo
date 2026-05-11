@@ -1,5 +1,5 @@
-import { clientRepository } from '@repositories/client.repository';
-import { Client, CreateClientPayload } from '@backendTypes/client.types';
+import { clientRepository } from '../repositories/client.repository';
+import { Client, CreateClientPayload } from '../types/client.types';
 
 export const clientService = {
   async processNewClient(payload: CreateClientPayload): Promise<Client> {

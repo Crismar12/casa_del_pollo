@@ -6,6 +6,8 @@
     "target": "ESNext",
     "allowJs": true,
     "resolveJsonModule": true,
+    "resolvePackageJsonImports": true,
+    "resolvePackageJsonExports": true,
     "moduleDetection": "force",
     "isolatedModules": true,
     "strict": true,
@@ -14,14 +16,11 @@
     "noFallthroughCasesInSwitch": true,
     "noEmit": true,
     "lib": ["esnext", "dom", "dom.iterable"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true
-
-  }
+  },
+  "include": ["src"],
+  "exclude": ["backend", "node_modules", "dist"]
 }

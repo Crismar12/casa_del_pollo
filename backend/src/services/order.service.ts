@@ -1,5 +1,5 @@
-import { orderRepository } from '@repositories/order.repository';
-import { CreateOrderPayload, Pedido, DetallePedido } from '@backendTypes/order.types';
+import { orderRepository } from '../repositories/order.repository';
+import { CreateOrderPayload, Pedido, DetallePedido } from '../types/order.types';
 
 interface OrderProduct {
   idproducto: number;

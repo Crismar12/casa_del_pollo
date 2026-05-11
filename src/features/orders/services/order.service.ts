@@ -1,6 +1,6 @@
 import type { Order, OrderStatus } from '../types';
-import type { CartItem } from '@/features/cart/types';
-import { apiClient } from '@/shared/utils/apiClient'; 
+import type { CartItem } from '../../cart/types';
+import { apiClient } from '../../../shared/utils/apiClient'; 
 
 interface CreateOrderFrontendPayload {
   clientId: number;
@@ -88,7 +88,14 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
       total: orderDetails.total,
       createdAt: orderDetails.fecha,
       status: orderDetails.estado,
-      products: orderDetails.products.map((p: BackendProduct) => ({ id: p.idproducto.toString(), name: p.name, quantity: p.quantity, price: p.price })),
+      products: orderDetails.products.map((p: BackendProduct) => ({
+        id: p.idproducto.toString(),
+        name: p.name,
+        description: '',
+        quantity: p.quantity,
+        price: p.price,
+        stock: 0,
+      })),
       paymentMethod: "Efectivo",
     };
 

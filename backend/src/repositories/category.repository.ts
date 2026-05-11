@@ -1,5 +1,5 @@
-import { supabase } from '@config/supabase';
-import { Category } from '@backendTypes/category.types';
+import { supabase } from '../config/supabase';
+import { Category } from '../types/category.types';
 
 export const categoryRepository = {
   async getAll(): Promise<Category[]> {

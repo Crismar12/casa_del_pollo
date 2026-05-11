@@ -1,6 +1,6 @@
-import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal  } from '@/features/admin/components';
+import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal  } from '../features/admin/components';
 import React from 'react';
-import { useDashboardSummary } from '@/features/admin/hooks/useDashboardSummary';
+import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
 import { RefreshCw } from 'lucide-react';
 
 export const AdminPage = () => {
