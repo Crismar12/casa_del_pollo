@@ -1,195 +1,197 @@
-# 🍗 La Casa de Pollo - Gestor de Pedidos
+# 🍗 La Casa de Pollo - Order Manager
 
-Sistema de gestión de pedidos para restaurante desarrollado con React, TypeScript y Supabase.
+Restaurant order management system developed with React, TypeScript, and Supabase.
 
-## 📋 Descripción
+## 📋 Description
 
-Aplicación web moderna para la gestión integral de pedidos de restaurante, que incluye funcionalidades de administración, catálogo de productos, carrito de compras y seguimiento de órdenes.
+Modern web application for comprehensive restaurant order management, including administrative features, a product catalog, a shopping cart, and order tracking.
 
-## ✨ Características
+## ✨ Features
 
-- 🔐 **Autenticación de usuarios** con Supabase
-- 🛒 **Carrito de compras** con gestión de productos
-- 📦 **Gestión de pedidos** en tiempo real
-- 👨‍💼 **Panel de administración** completo
-- 📱 **Diseño responsive** para móviles y tablets
-- 📊 **Visualización de datos** con gráficos (Recharts)
-- 🎨 **UI moderna** con Tailwind CSS y Headless UI
+- 🔐 **User Authentication** with Supabase
+- 🛒 **Shopping Cart** with Product Management
+- 📦 **Real-Time Order Management**
+- 👨‍💼 **Complete Admin Panel**
+- 📱 **Responsive Design** for Mobile and Tablets
+- 📊 **Data Visualization** with Charts (Recharts)
+- 🎨 **Modern UI** with Tailwind CSS and Headless UI
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Technology Stack
 
 ### Frontend
-- **React 19.2** - Biblioteca de interfaz de usuario
-- **TypeScript** - Tipado estático
-- **Vite** - Build tool y dev server
-- **React Router DOM** - Enrutamiento
-- **Redux Toolkit** - Gestión de estado
-- **Tailwind CSS** - Estilos utilitarios
-- **Headless UI** - Componentes accesibles
-- **Heroicons & Lucide React** - Iconografía
-- **Recharts** - Visualización de datos
+- **React 19.2** - UI Library
+- **TypeScript** - Static Typing
+- **Vite** - Build Tool and Dev Server
+- **React Router DOM** - Routing
+- **Redux Toolkit** - State Management
+- **Tailwind CSS** - Utility Styles
+- **Headless UI** - Accessible Components
+- **Heroicons & Lucide React** - Iconography
+- **Recharts** - Data Visualization
 - **Supabase** - Backend as a Service
 
 ### Backend
-- **Node.js** con **Express**
+- **Node.js** with **Express**
 - **TypeScript**
-- **Supabase** - Base de datos y autenticación
-- **CORS** - Configuración de seguridad
+- **Supabase** - Database and Authentication
+- **CORS** - Security Configuration
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 la-casa-de-pollo-gestor-pedidos/
 ├── src/
-│   ├── features/          # Características por módulo
-│   │   ├── admin/
-│   │   ├── auth/
-│   │   ├── cart/
-│   │   ├── orders/
-│   │   └── products/
-│   ├── pages/             # Páginas de la aplicación
-│   ├── shared/            # Componentes y utilidades compartidas
-│   ├── store/             # Configuración de Redux
-│   ├── routes/            # Configuración de rutas
-│   └── config/            # Configuraciones generales
-├── backend/               # API backend
-│   └── src/
-├──db.sql                 # script de la base de datos
-└── public/               # Archivos estáticos
+│ ├── features/ # Features per Module
+│ │ ├── admin/
+│ │ ├── auth/
+│ │ ├── cart/
+│ │ ├── orders/
+│ │ └── products/
+│ ├── pages/ # Application Pages
+│ ├── shared/ # Shared Components and Utilities
+│ ├── store/ # Redux Configuration
+│ ├── routes/ # Route Configuration
+│ └── config/ # General Configurations
+├── backend/ # Backend API
+│ └── src/
+├──db.sql # Database Script
+└── public/ # Static Files
 
 ```
 
-## 🚀 Instalación y Configuración
+## 🚀 Installation and Configuration
 
-### Prerrequisitos
-- Node.js (versión 18 o superior)
-- npm o yarn
+### Prerequisites
+- Node.js (version 18 or higher)
+- npm or yarn
 
-### Instalación Frontend
+### Frontend Installation
 
 ```bash
-# Instalar dependencias
+# Install dependencies
 npm install
 
-# Modo desarrollo
+# Development mode
 npm run dev
 
-# Build para producción
+# Production build
 npm run build
 
-# Vista previa del build
+# Build preview
 npm run preview
 
-# Ejecutar linter
+# Run linter
 npm run lint
 ```
 
-### Instalación Backend
+### Backend Installation
 
 ```bash
 cd backend
 
-# Instalar dependencias
+# Install dependencies
 npm install
 
-# Modo desarrollo
+# Development mode
 npm run dev
 ```
 
-### Variables de Entorno
+### Environment Variables
 
-Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
+Create a `.env` file in the project root with the following variables:
 
-```env
+```send
 VITE_SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
-VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_BACKEND_API_URL=http://localhost:4000
 SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
-SUPABASE_ANON_KEY=tu_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_ANON_KEY=your_supabase_anon_key
 PORT=4000
 ```
 
-Para el backend, también existe el archivo [`backend/.env.example`](backend/.env.example). La forma recomendada de usarlo es copiarlo a [`backend/.env`](backend/.env) y completar la `SUPABASE_SERVICE_ROLE_KEY`:
+For the backend, there is also the file [`backend/.env.example`](backend/.env.example). The recommended way to use it is to copy it to [`backend/.env`](backend/.env) and complete the `SUPABASE_SERVICE_ROLE_KEY`:
 
 ```powershell
 Copy-Item backend\.env.example backend\.env
 ```
 
-Si prefieres hacerlo a mano, asegúrate de que el backend tenga al menos estas variables:
+If you prefer to do it manually, make sure the backend has at least these variables:
 
 ```env
 SUPABASE_URL=https://ytuzhqypnfkcptetvadl.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 PORT=4000
 ```
 
-## ▶️ Cómo levantar la app
+## ▶️ How to start the app
 
-1. Instala dependencias en la raíz:
+1. Install dependencies in the root directory:
 
 ```bash
 npm install
 ```
 
-2. Instala dependencias del backend:
+2. Install backend dependencies:
 
 ```bash
 cd backend
 npm install
 ```
 
-3. Crea el archivo de entorno del backend desde el ejemplo:
+3. Create the file From the example backend environment:
 
 ```powershell
 Copy-Item backend\.env.example backend\.env
 ```
 
-4. Inicia el backend:
+4. Start the backend:
 
 ```bash
 cd backend
 npm run dev
 ```
 
-5. En otra terminal, inicia el frontend:
+5. In another terminal, start the frontend:
 
 ```bash
 npm run dev
 ```
 
-## 📝 Notas Importantes
+## 📝 Important Notes
 
-- El frontend usa las variables `VITE_*` del `.env` raíz.
-- El backend no debe usar la `SERVICE_ROLE_KEY` en variables `VITE_*`.
-- Si cambias el `.env`, reinicia el proceso correspondiente para que cargue los valores nuevos.
+- The frontend uses the `VITE_*` variables from the root `.env` file.
 
-## 📄 Scripts Disponibles
+- The backend should not use `SERVICE_ROLE_KEY` in `VITE_*` variables.
+
+- If you change the `.env` file, restart the corresponding process so that it loads the new values.
+
+## 📄 Available Scripts
 
 ### Frontend
-- `npm run dev` - Inicia el servidor de desarrollo
-- `npm run build` - Compila la aplicación para producción
-- `npm run preview` - Vista previa del build de producción
-- `npm run lint` - Ejecuta el linter de ESLint
+- `npm run dev` - Starts the development server
+- `npm run build` - Compiles the application for production
+- `npm run preview` - Previews the production build
+- `npm run lint` - Runs the ESLint linter
 
 ### Backend
-- `npm run dev` - Inicia el servidor backend con nodemon
+- `npm run dev` - Starts the backend server with nodemon
 
-## 🎯 Páginas Principales
+## 🎯 Main Pages
 
-- **Login** - Autenticación de usuarios
-- **Productos** - Catálogo de productos disponibles
-- **Carrito** - Gestión del carrito de compras
-- **Pedidos** - Historial y seguimiento de órdenes
-- **Admin** - Panel de administración
+- **Login** - User authentication
+- **Products** - Catalog of available products
+- **Cart** - Shopping cart management
+- **Orders** - Order history and tracking
+- **Admin** - Admin panel
 
-## 🔧 Tecnologías de Desarrollo
+## 🔧 Development Technologies
 
-- ESLint - Linting de código
-- TypeScript ESLint - Reglas específicas para TypeScript
-- PostCSS - Procesamiento de CSS
-- Autoprefixer - Prefijos automáticos de CSS
+- ESLint - Code linting
+- TypeScript ESLint - Specific rules for TypeScript
+- PostCSS - CSS processing
+- Autoprefixer - Automatic prefixes CSS
 
 ---
 
-Desarrollado con ❤️ 
+Developed with ❤️
