@@ -1,26 +1,25 @@
-import { supabase } from '../config/supabase';
+import { db } from '../config/database';
 import { Product } from '../types/product.types';
 
 export const productRepository = {
   async getAll(categoryId?: string): Promise<Product[]> {
-    let query = supabase.from('producto').select('*, imageUrl:imgUrl');
-
     if (categoryId) {
-      query = query.eq('categoria_id', categoryId);
+      const result = await db.query(
+        'SELECT *, "imgUrl" AS "imageUrl" FROM producto WHERE categoria_id = $1',
+        [categoryId]
+      );
+      return result.rows as Product[];
     }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching products from Supabase:', error);
-      throw new Error('Could not fetch products');
-    }
-    return data as Product[];
+    const result = await db.query('SELECT *, "imgUrl" AS "imageUrl" FROM producto');
+    return result.rows as Product[];
   },
 
   async getById(id: string): Promise<Product | null> {
-    const { data, error } = await supabase.from('producto').select('*, imageUrl:imgUrl').eq('id', id).single();
-    if (error) throw error;
-    return data as Product | null;
+    const result = await db.query(
+      'SELECT *, "imgUrl" AS "imageUrl" FROM producto WHERE id = $1',
+      [id]
+    );
+    if (result.rows.length === 0) return null;
+    return result.rows[0] as Product;
   },
 };

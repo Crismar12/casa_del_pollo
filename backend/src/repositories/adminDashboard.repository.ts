@@ -1,31 +1,20 @@
-import { supabase } from '../config/supabase';
+import { db } from '../config/database';
 import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
-    const { data: detalleData, error: detalleError } = await supabase
-      .from('detallepedido')
-      .select(`
-        idproducto,
-        cantidad
-      `);
+    const detalleResult = await db.query(
+      'SELECT idproducto, cantidad FROM detallepedido'
+    );
 
-    if (detalleError) {
-      console.error('Supabase error fetching detallepedido for most sold products:', detalleError);
-      throw new Error('Could not fetch order details for most sold products');
-    }
-
- 
-    const aggregatedSales = detalleData.reduce((acc: { [key: number]: number }, item) => {
-      acc[item.idproducto] = (acc[item.idproducto] || 0) + item.cantidad;
-      return acc;
-    }, {});
-
+    const aggregatedSales: { [key: number]: number } = {};
+    detalleResult.rows.forEach((item: { idproducto: number; cantidad: number }) => {
+      aggregatedSales[item.idproducto] = (aggregatedSales[item.idproducto] || 0) + item.cantidad;
+    });
 
     const sortedProductSales = Object.entries(aggregatedSales)
       .sort(([, countA], [, countB]) => (countB as number) - (countA as number))
       .slice(0, limit);
-
 
     const topProductIds = sortedProductSales.map(([id]) => parseInt(id));
 
@@ -33,32 +22,22 @@ export const adminDashboardRepository = {
       return [];
     }
 
-    const { data: productsData, error: productsError } = await supabase
-      .from('producto')
-      .select(`
-        idproducto,
-        nombre,
-        categoria_id,
-        categorias(nombre)
-      `)
-      .in('idproducto', topProductIds);
-
-    if (productsError) {
-      console.error('Supabase error fetching product details for most sold products:', productsError);
-      throw new Error('Could not fetch product details for most sold products');
-    }
-
+    const productsResult = await db.query(
+      `SELECT p.idproducto, p.nombre, p.categoria_id, c.nombre AS categoria_nombre
+       FROM producto p
+       LEFT JOIN categorias c ON p.categoria_id = c.idcategoria
+       WHERE p.idproducto = ANY($1)`,
+      [topProductIds]
+    );
 
     const totalSalesAmount = Object.values(aggregatedSales).reduce((sum, count) => sum + (count as number), 0);
 
-
     const result: MostSoldProduct[] = sortedProductSales.map(([id, salesAmount]) => {
-      const product = productsData.find(p => p.idproducto === parseInt(id));
-      const categoryName = product?.categorias && product.categorias.length > 0 ? (product.categorias[0] as { nombre: string }).nombre : 'Unknown';
+      const product = productsResult.rows.find((p: { idproducto: number }) => p.idproducto === parseInt(id));
       return {
         id: product?.idproducto.toString() || '',
         name: product?.nombre || 'Unknown',
-        category: categoryName,
+        category: product?.categoria_nombre || 'Unknown',
         salesAmount: salesAmount as number,
         percentage: totalSalesAmount > 0 ? parseFloat(((salesAmount as number / totalSalesAmount) * 100).toFixed(2)) : 0,
       };
@@ -75,113 +54,68 @@ export const adminDashboardRepository = {
     const todayISO = today.toISOString().split('T')[0];
     const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
 
-    const { data: pedidosData, error: pedidosError } = await supabase
-      .from('pedido')
-      .select('fecha, total')
-      .gte('fecha', sevenDaysAgoISO)
-      .lte('fecha', todayISO)
-      .order('fecha', { ascending: true });
-
-    if (pedidosError) {
-      console.error('Supabase error fetching pedidos for weekly summary:', pedidosError);
-      throw new Error('Could not fetch orders for weekly summary');
-    }
+    const result = await db.query(
+      'SELECT fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 ORDER BY fecha ASC',
+      [sevenDaysAgoISO, todayISO]
+    );
 
     const dailySalesMap: { [key: string]: number } = {};
-    pedidosData.forEach(pedido => {
+    result.rows.forEach((pedido: { fecha: string; total: number }) => {
       const day = pedido.fecha;
       dailySalesMap[day] = (dailySalesMap[day] || 0) + pedido.total;
     });
 
-    const result: DailySalesData[] = [];
+    const dailyResult: DailySalesData[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dayString = date.toISOString().split('T')[0];
       const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
-      result.push({
+      dailyResult.push({
         day: dayName.charAt(0).toUpperCase() + dayName.slice(1).replace('.', ''),
         earnings: dailySalesMap[dayString] || 0,
       });
     }
 
-    return result;
+    return dailyResult;
   },
 
   async getSalesToday(): Promise<number> {
     const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', today)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching sales today:', error);
-      throw new Error('Could not fetch sales today');
-    }
-    return data.reduce((sum, order) => sum + (order.total || 0), 0);
+    const result = await db.query(
+      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      [today]
+    );
+    return parseFloat(result.rows[0].total) || 0;
   },
 
   async getOrdersToday(): Promise<number> {
     const today = new Date().toISOString().split('T')[0];
-    const { count, error } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('fecha', today);
-
-    if (error) {
-      console.error('Supabase error fetching orders today:', error);
-      throw new Error('Could not fetch orders today');
-    }
-    return count || 0;
+    const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [today]);
+    return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicket(): Promise<number> {
     const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', today)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching average ticket:', error);
-      throw new Error('Could not fetch average ticket');
-    }
-
-    if (data.length === 0) {
-      return 0;
-    }
-    const totalSales = data.reduce((sum, order) => sum + (order.total || 0), 0);
-    return parseFloat((totalSales / data.length).toFixed(2));
+    const result = await db.query(
+      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      [today]
+    );
+    return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
   },
 
   async getCancellationRate(): Promise<number> {
-    const { count: totalOrdersCount, error: totalError } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true });
+    const totalResult = await db.query('SELECT COUNT(*) FROM pedido');
+    const totalOrdersCount = parseInt(totalResult.rows[0].count, 10);
 
-    if (totalError) {
-      console.error('Supabase error fetching total orders for cancellation rate:', totalError);
-      throw new Error('Could not fetch total orders for cancellation rate');
-    }
+    if (totalOrdersCount === 0) return 0;
 
-    const { count: cancelledOrdersCount, error: cancelledError } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('estado', 'cancelado');
+    const cancelledResult = await db.query(
+      "SELECT COUNT(*) FROM pedido WHERE estado = 'cancelado'"
+    );
+    const cancelledOrdersCount = parseInt(cancelledResult.rows[0].count, 10);
 
-    if (cancelledError) {
-      console.error('Supabase error fetching cancelled orders for cancellation rate:', cancelledError);
-      throw new Error('Could not fetch cancelled orders for cancellation rate');
-    }
-
-    if (totalOrdersCount === 0) {
-      return 0;
-    }
-
-    return parseFloat(((cancelledOrdersCount || 0) / (totalOrdersCount || 0) * 100).toFixed(2));
+    return parseFloat(((cancelledOrdersCount / totalOrdersCount) * 100).toFixed(2));
   },
 
   async getSalesYesterday(): Promise<number> {
@@ -189,17 +123,11 @@ export const adminDashboardRepository = {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayISO = yesterday.toISOString().split('T')[0];
 
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', yesterdayISO)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching sales yesterday:', error);
-      throw new Error('Could not fetch sales yesterday');
-    }
-    return data.reduce((sum, order) => sum + (order.total || 0), 0);
+    const result = await db.query(
+      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      [yesterdayISO]
+    );
+    return parseFloat(result.rows[0].total) || 0;
   },
 
   async getOrdersYesterday(): Promise<number> {
@@ -207,16 +135,8 @@ export const adminDashboardRepository = {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayISO = yesterday.toISOString().split('T')[0];
 
-    const { count, error } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('fecha', yesterdayISO);
-
-    if (error) {
-      console.error('Supabase error fetching orders yesterday:', error);
-      throw new Error('Could not fetch orders yesterday');
-    }
-    return count || 0;
+    const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [yesterdayISO]);
+    return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicketYesterday(): Promise<number> {
@@ -224,21 +144,10 @@ export const adminDashboardRepository = {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayISO = yesterday.toISOString().split('T')[0];
 
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', yesterdayISO)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching average ticket yesterday:', error);
-      throw new Error('Could not fetch average ticket yesterday');
-    }
-
-    if (data.length === 0) {
-      return 0;
-    }
-    const totalSales = data.reduce((sum, order) => sum + (order.total || 0), 0);
-    return parseFloat((totalSales / data.length).toFixed(2));
+    const result = await db.query(
+      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      [yesterdayISO]
+    );
+    return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
   },
 };
