@@ -8,7 +8,7 @@ Modern web application for comprehensive restaurant order management, including 
 
 ## Features
 
-- **User Authentication** with JWT
+- **User Authentication** with email and password
 - **Shopping Cart** with Product Management
 - **Order Management** with status tracking
 - **Complete Admin Panel** with sales dashboard and charts
@@ -40,30 +40,34 @@ Modern web application for comprehensive restaurant order management, including 
 
 ```
 la-casa-de-pollo-gestor-pedidos/
-├── src/                          # Frontend (React + TypeScript)
-│   ├── features/                 # Features per Module
-│   │   ├── admin/
-│   │   ├── auth/
-│   │   ├── cart/
-│   │   ├── orders/
-│   │   └── products/
-│   ├── pages/                    # Application Pages
-│   ├── shared/                   # Shared Components and Utilities
-│   ├── store/                    # Redux Configuration
-│   ├── routes/                   # Route Configuration
-│   └── config/                   # General Configurations
-├── backend/                      # Backend API (Express)
+├── frontend/                       # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── features/               # Features per Module
+│   │   │   ├── admin/
+│   │   │   ├── auth/
+│   │   │   ├── cart/
+│   │   │   ├── orders/
+│   │   │   └── products/
+│   │   ├── pages/                  # Application Pages
+│   │   ├── shared/                 # Shared Components and Utilities
+│   │   ├── store/                  # Redux Configuration
+│   │   ├── routes/                 # Route Configuration
+│   │   └── config/                 # General Configurations
+│   ├── public/                     # Static Files
+│   ├── index.html                  # Entry HTML
+│   ├── vite.config.ts              # Vite Configuration
+│   └── package.json                # Frontend Dependencies
+├── backend/                        # Backend API (Express)
 │   └── src/
-│       ├── config/               # Database configuration
-│       ├── controllers/          # HTTP controllers
-│       ├── repositories/         # Data access layer (SQL queries)
-│       ├── routes/               # API routes
-│       ├── services/             # Business logic
-│       └── types/                # TypeScript types
-├── db.sql                        # Database Script (PostgreSQL)
-├── .env                          # Frontend environment variables
-├── .env.example                  # Frontend env template
-└── public/                       # Static Files
+│       ├── config/                 # Database configuration
+│       ├── controllers/            # HTTP controllers
+│       ├── repositories/           # Data access layer (SQL queries)
+│       ├── routes/                 # API routes
+│       ├── services/               # Business logic
+│       └── types/                  # TypeScript types
+├── db.sql                          # Database Script (PostgreSQL)
+├── README.md                       # Project Documentation
+└── .gitignore                      # Git ignore rules
 ```
 
 ## Installation and Configuration
@@ -76,6 +80,8 @@ la-casa-de-pollo-gestor-pedidos/
 ### Frontend Installation
 
 ```bash
+cd frontend
+
 # Install dependencies
 npm install
 
@@ -106,19 +112,15 @@ npm run dev
 
 ### Environment Variables
 
-#### Frontend (root `.env`)
-
-Create a `.env` file in the project root:
+#### Frontend (`frontend/.env`)
 
 ```env
 VITE_BACKEND_API_URL="http://localhost:4000"
 ```
 
-See [`.env.example`](.env.example) for reference.
+See [`frontend/.env.example`](frontend/.env.example) for reference.
 
 #### Backend (`backend/.env`)
-
-Create a `.env` file in the `backend/` directory:
 
 ```env
 DATABASE_URL="postgresql://neondb_owner:<YOUR_PASSWORD>@<YOUR_ENDPOINT>.neon.tech/neondb?sslmode=require"
@@ -142,6 +144,7 @@ See [`backend/.env.example`](backend/.env.example) for reference.
 1. Install frontend dependencies:
 
 ```bash
+cd frontend
 npm install
 ```
 
@@ -156,7 +159,7 @@ npm install
 
 ```bash
 # Frontend
-Copy-Item .env.example .env
+Copy-Item frontend\.env.example frontend\.env
 
 # Backend
 Copy-Item backend\.env.example backend\.env
@@ -175,8 +178,22 @@ npm run dev
 6. In another terminal, start the frontend:
 
 ```bash
+cd frontend
 npm run dev
 ```
+
+## Deployment
+
+### Frontend (Vercel)
+- **Framework:** Vite
+- **Root Directory:** `frontend`
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+
+### Backend (Render)
+- **Root Directory:** `backend`
+- **Build Command:** `npm install`
+- **Start Command:** `npm run dev`
 
 ## Important Notes
 
