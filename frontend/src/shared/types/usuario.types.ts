@@ -3,5 +3,11 @@ export interface Usuario {
   nombre: string;
   email: string;
   rol: string;
-  
+}
+
+export interface AuthResponse {
+  message: string;
+  user: Usuario;
+  accessToken: string;
+  refreshToken: string;
 }

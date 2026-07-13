@@ -7,4 +7,10 @@ export const authRepository = {
     if (result.rows.length === 0) return null;
     return result.rows[0] as Usuario;
   },
+
+  async findById(id: string): Promise<Usuario | null> {
+    const result = await db.query('SELECT * FROM usuario WHERE idusuario = $1', [id]);
+    if (result.rows.length === 0) return null;
+    return result.rows[0] as Usuario;
+  },
 };
