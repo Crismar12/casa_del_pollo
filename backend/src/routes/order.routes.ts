@@ -1,14 +1,15 @@
 import { Router } from 'express';
 import { orderController } from '../controllers/order.controller';
 import { authMiddleware } from '../middleware/auth';
+import { authorize } from '../middleware/authorize';
 
 const router = Router();
 
 router.use(authMiddleware);
 
-router.post('', orderController.createOrder);
-router.get('/', orderController.getOrders);
-router.get('/:id', orderController.getOrderById);
-router.patch('/:id/status', orderController.updateOrderStatus);
+router.post('', authorize('admin', 'vendedor'), orderController.createOrder);
+router.get('/', authorize('admin', 'vendedor'), orderController.getOrders);
+router.get('/:id', authorize('admin', 'vendedor'), orderController.getOrderById);
+router.patch('/:id/status', authorize('admin'), orderController.updateOrderStatus);
 
 export default router;
