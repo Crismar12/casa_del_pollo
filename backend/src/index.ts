@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
 import { corsOptions } from './config/cors';
+import { apiLimiter } from './middleware/rateLimiter';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(apiLimiter);
 
 
 app.use('/api/products', productRoutes);
