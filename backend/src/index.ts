@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { corsOptions } from './config/cors';
 import { apiLimiter } from './middleware/rateLimiter';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -38,6 +39,6 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor Express escuchando en http://localhost:${PORT}`);
-  console.log('Backend started successfully!');
+  logger.info(`Servidor Express escuchando en http://localhost:${PORT}`);
+  logger.info('Backend started successfully!');
 });
