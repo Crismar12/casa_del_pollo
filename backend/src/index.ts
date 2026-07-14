@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
+import helmet from 'helmet';
 import { corsOptions } from './config/cors';
 import { apiLimiter } from './middleware/rateLimiter';
 
@@ -17,6 +18,7 @@ import adminDashboardRoutes from './routes/adminDashboard.routes';
 const app = express();
 
 
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(apiLimiter);
