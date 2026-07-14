@@ -1,10 +1,11 @@
-import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal  } from '../features/admin/components';
-import React from 'react';
+import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm } from '../features/admin/components';
+import React, { useState } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Users, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
+  const [showUsers, setShowUsers] = useState(false);
 
   if (loading) {
     return (
@@ -96,6 +97,25 @@ export const AdminPage = () => {
       </div>
       <div className="w-full">
         <ResumenSemanal />
+      </div>
+
+      <div className="mt-8">
+        <button
+          onClick={() => setShowUsers(!showUsers)}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
+        >
+          <span className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Gestionar Usuarios
+          </span>
+          {showUsers ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        </button>
+
+        {showUsers && (
+          <div className="mt-4 max-w-md">
+            <UserForm onUserCreated={() => {}} />
+          </div>
+        )}
       </div>
     </div>
   );

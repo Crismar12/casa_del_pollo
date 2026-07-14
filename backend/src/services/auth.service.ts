@@ -55,4 +55,14 @@ export const authService = {
       options
     );
   },
+
+  async register(nombre: string, email: string, contrasena: string, rol: string): Promise<Omit<Usuario, 'contrasena'>> {
+    const exists = await authRepository.findByEmail(email);
+    if (exists) throw new Error('Email already registered');
+
+    const hash = await bcrypt.hash(contrasena, 10);
+    const user = await authRepository.create(nombre, email, hash, rol);
+    const { contrasena: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  },
 };

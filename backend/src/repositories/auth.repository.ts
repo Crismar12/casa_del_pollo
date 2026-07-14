@@ -13,4 +13,12 @@ export const authRepository = {
     if (result.rows.length === 0) return null;
     return result.rows[0] as Usuario;
   },
+
+  async create(nombre: string, email: string, contrasena: string, rol: string): Promise<Usuario> {
+    const result = await db.query(
+      'INSERT INTO usuario (nombre, email, contrasena, rol) VALUES ($1, $2, $3, $4) RETURNING *',
+      [nombre, email, contrasena, rol]
+    );
+    return result.rows[0] as Usuario;
+  },
 };
