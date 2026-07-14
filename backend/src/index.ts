@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
+import { corsOptions } from './config/cors';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ import adminDashboardRoutes from './routes/adminDashboard.routes';
 const app = express();
 
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 
