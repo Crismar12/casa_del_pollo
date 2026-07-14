@@ -2,6 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
+import helmet from 'helmet';
+import { corsOptions } from './config/cors';
+import { apiLimiter } from './middleware/rateLimiter';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -15,8 +19,10 @@ import adminDashboardRoutes from './routes/adminDashboard.routes';
 const app = express();
 
 
-app.use(cors());
+app.use(helmet());
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(apiLimiter);
 
 
 app.use('/api/products', productRoutes);
@@ -33,6 +39,6 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor Express escuchando en http://localhost:${PORT}`);
-  console.log('Backend started successfully!');
+  logger.info(`Servidor Express escuchando en http://localhost:${PORT}`);
+  logger.info('Backend started successfully!');
 });

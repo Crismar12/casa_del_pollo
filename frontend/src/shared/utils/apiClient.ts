@@ -4,20 +4,23 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
+let refreshAccessTokenFn: (() => Promise<string | null>) | null = null;
+
+export const setRefreshTokenFn = (fn: () => Promise<string | null>): void => {
+  refreshAccessTokenFn = fn;
+};
+
 export const apiClient = {
   async handleResponse<T>(response: Response): Promise<T> {
-
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
     return response.json();
-
   },
 
   buildUrl(path: string, params?: Record<string, string | number | boolean | undefined>): URL {
-
     const url = new URL(`${BACKEND_API_URL}${path}`);
 
     if (params) {
@@ -26,13 +29,18 @@ export const apiClient = {
           url.searchParams.append(key, String(value));
         }
       });
-
     }
 
     return url;
-
   },
 
+  getAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      return { Authorization: `Bearer ${token}` };
+    }
+    return {};
+  },
 
   async get<T>(path: string, options?: RequestOptions): Promise<T> {
     return this.request<T>('GET', path, options);
@@ -43,7 +51,7 @@ export const apiClient = {
   async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', path, options, body);
   },
-  async request<T>(method: string, path: string, options?: RequestOptions, body?: unknown): Promise<T> {
+  async request<T>(method: string, path: string, options?: RequestOptions, body?: unknown, isRetry = false): Promise<T> {
     const { params, ...fetchOptions } = options || {};
     const url = this.buildUrl(path, params);
 
@@ -52,12 +60,19 @@ export const apiClient = {
       method,
       headers: {
         'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
         ...fetchOptions.headers,
       },
       body: body ? JSON.stringify(body) : undefined,
     });
 
+    if (response.status === 401 && !isRetry && refreshAccessTokenFn) {
+      const newToken = await refreshAccessTokenFn();
+      if (newToken) {
+        return this.request<T>(method, path, options, body, true);
+      }
+    }
+
     return this.handleResponse(response);
   },
 };
-
