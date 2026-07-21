@@ -29,7 +29,7 @@ export const Navigation: React.FC = () => {
       className={({ isActive }) =>
         `flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
           isActive
-            ? 'bg-linear-to-r from-red-500 to-orange-500 text-white'
+            ? 'bg-linear-to-r from-orange-500 to-red-600 text-white'
             : 'text-gray-700 hover:bg-gray-100'
         }`
       }

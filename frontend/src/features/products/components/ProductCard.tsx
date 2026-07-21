@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <button
             onClick={handleAddToCart}
             aria-label={`Añadir ${product.name} al carrito`}
-            className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold p-2 rounded-lg shadow-md transition-transform duration-200 ease-in-out hover:scale-110 z-10"
+            className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold p-2 rounded-lg shadow-md transition-transform duration-200 ease-in-out hover:scale-110 z-10"
           >
             <Plus className="w-5 h-5" />
           </button>

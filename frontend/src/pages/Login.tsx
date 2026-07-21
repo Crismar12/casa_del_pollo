@@ -47,10 +47,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-yellow-300 via-yellow-500 to-red-400">
-      <div className="bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-yellow-300">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-orange-400 via-red-500 to-orange-700">
+      <div className="bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-orange-300">
         <div className="mb-4">
-          <h1 className="text-3xl font-extrabold text-yellow-600 drop-shadow-sm">
+          <h1 className="text-3xl font-extrabold text-orange-600 drop-shadow-sm">
             🐔 El Paraíso del Pollo
           </h1>
           <p className="text-gray-600 mt-1 text-sm font-medium">

@@ -27,7 +27,7 @@ export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; on
             className={({ isActive }) =>
               `flex items-center px-6 py-2 rounded-md text-sm font-medium ${
                 isActive
-                  ? "bg-linear-to-r from-red-500 to-orange-500 text-white"
+                  ? "bg-linear-to-r from-orange-500 to-red-600 text-white"
                   : "text-gray-700 hover:bg-gray-100"
               }`
             }

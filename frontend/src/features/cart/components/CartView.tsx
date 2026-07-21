@@ -73,7 +73,7 @@ export const CartView = () => {
                                 <p className="text-gray-500 text-lg">Tu carrito está vacío</p>
                                 <button
                                     onClick={() => navigate("/producto")}
-                                    className="mt-6 w-full bg-linear-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-lg"
+                                    className="mt-6 w-full bg-linear-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg"
                                 >
                                     Ver Menú
                                 </button>
@@ -156,7 +156,7 @@ export const CartView = () => {
                                 </div>
                                 <button
                                     onClick={handleConfirmOrderClick}
-                                    className="w-full bg-linear-to-r from-red-500 to-orange-500 text-white py-4 rounded-lg font-bold"
+                                    className="w-full bg-linear-to-r from-orange-500 to-red-600 text-white py-4 rounded-lg font-bold"
                                 >
                                     Confirmar Pedido
                                 </button>

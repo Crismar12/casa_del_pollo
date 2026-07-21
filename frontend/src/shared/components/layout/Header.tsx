@@ -30,7 +30,7 @@ export const AppHeader: React.FC<{ onMenuClick: () => void; className?: string }
   const title = getTitle(location.pathname);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 flex items-center bg-gray-50 px-4 sm:px-6 h-16 shadow-md z-30 ${className}`}>
+    <header className={`fixed top-0 left-0 right-0 flex items-center bg-orange-50 px-4 sm:px-6 h-16 shadow-md z-30 ${className}`}>
       <div className="w-full flex items-center">
         <Button 
           onClick={onMenuClick} 
