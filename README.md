@@ -1,4 +1,4 @@
-# La Casa de Pollo - Order Manager
+# 🐔 El Paraíso del Pollo - Order Manager
 
 Restaurant order management system developed with React, TypeScript, Express, and Neon.tech (PostgreSQL).
 

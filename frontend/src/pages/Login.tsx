@@ -51,7 +51,7 @@ export default function Login() {
       <div className="bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-yellow-300">
         <div className="mb-4">
           <h1 className="text-3xl font-extrabold text-yellow-600 drop-shadow-sm">
-            🐔 La Casa del Pollo
+            🐔 El Paraíso del Pollo
           </h1>
           <p className="text-gray-600 mt-1 text-sm font-medium">
             ¡Bienvenido! Ingresa para continuar

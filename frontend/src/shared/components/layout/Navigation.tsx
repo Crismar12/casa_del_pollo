@@ -63,7 +63,7 @@ export const Navigation: React.FC = () => {
 
            
             <NavLink to="/" className="ml-4 text-xl font-bold text-gray-900">
-              La Casa del Pollo
+              🐔 El Paraíso del Pollo
             </NavLink>
           </div>
 

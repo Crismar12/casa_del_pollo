@@ -21,7 +21,7 @@ const getTitle = (pathname: string) => {
     case "/login":
       return "Login";
     default:
-      return "La Casa del Pollo";
+      return "🐔 El Paraíso del Pollo";
   }
 };
 
