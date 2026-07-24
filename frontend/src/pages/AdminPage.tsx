@@ -1,9 +1,10 @@
 import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm } from '../features/admin/components';
-import { ProductForm } from '../features/products/components';
+import { ProductForm, CategoryForm } from '../features/products/components';
 import { getProductos } from '../features/products/services/product.service';
+import { getCategories } from '../features/products/services/category.service';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
-import { RefreshCw, Users, ChevronDown, ChevronUp, Package, Pencil } from 'lucide-react';
+import { RefreshCw, Users, ChevronDown, ChevronUp, Package, Pencil, Tag } from 'lucide-react';
 
 export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
@@ -20,6 +21,9 @@ export const AdminPage = () => {
     activo: boolean;
   }>>([]);
   const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
+  const [showCategories, setShowCategories] = useState(false);
+  const [categories, setCategories] = useState<Array<{ id: string; nombre: string; descripcion?: string }>>([]);
+  const [editingCategory, setEditingCategory] = useState<typeof categories[0] | null>(null);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -30,11 +34,26 @@ export const AdminPage = () => {
     }
   }, []);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (showProducts) {
       fetchProducts();
     }
   }, [showProducts, fetchProducts]);
+
+  useEffect(() => {
+    if (showCategories) {
+      fetchCategories();
+    }
+  }, [showCategories, fetchCategories]);
 
   if (loading) {
     return (
@@ -209,6 +228,66 @@ export const AdminPage = () => {
                 product={editingProduct}
                 onProductSaved={() => { fetchProducts(); setEditingProduct(null); }}
                 onCancel={() => setEditingProduct(null)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <button
+          onClick={() => { setShowCategories(!showCategories); setEditingCategory(null); }}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
+        >
+          <span className="flex items-center gap-2">
+            <Tag className="w-5 h-5" />
+            Gestionar Categorías
+          </span>
+          {showCategories ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        </button>
+
+        {showCategories && (
+          <div className="mt-4 space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Categorías Existentes</h3>
+              {categories.length === 0 ? (
+                <p className="text-gray-500">No hay categorías registradas.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left text-gray-500">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3">Nombre</th>
+                        <th className="px-4 py-3">Descripción</th>
+                        <th className="px-4 py-3">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categories.map((c) => (
+                        <tr key={c.id} className="bg-white border-b">
+                          <td className="px-4 py-3 font-medium text-gray-900">{c.nombre}</td>
+                          <td className="px-4 py-3 text-gray-500">{c.descripcion || '-'}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => { setEditingCategory(c); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="max-w-md">
+              <CategoryForm
+                category={editingCategory}
+                onCategorySaved={() => { fetchCategories(); setEditingCategory(null); }}
+                onCancel={() => setEditingCategory(null)}
               />
             </div>
           </div>
