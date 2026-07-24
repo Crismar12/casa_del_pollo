@@ -3,3 +3,10 @@ export interface Category {
   nombre: string;
   descripcion?: string;
 }
+
+export interface CreateCategoryPayload {
+  nombre: string;
+  descripcion?: string;
+}
+
+export type UpdateCategoryPayload = Partial<CreateCategoryPayload>;
