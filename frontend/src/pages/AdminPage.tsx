@@ -1,11 +1,40 @@
 import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm } from '../features/admin/components';
-import React, { useState } from 'react';
+import { ProductForm } from '../features/products/components';
+import { getProductos } from '../features/products/services/product.service';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
-import { RefreshCw, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { RefreshCw, Users, ChevronDown, ChevronUp, Package, Pencil } from 'lucide-react';
 
 export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
   const [showUsers, setShowUsers] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
+  const [products, setProducts] = useState<Array<{
+    id: string;
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    stock: number;
+    imageUrl?: string;
+    categoria_id?: number | null;
+    activo: boolean;
+  }>>([]);
+  const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const data = await getProductos();
+      setProducts(data);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showProducts) {
+      fetchProducts();
+    }
+  }, [showProducts, fetchProducts]);
 
   if (loading) {
     return (
@@ -114,6 +143,74 @@ export const AdminPage = () => {
         {showUsers && (
           <div className="mt-4 max-w-md">
             <UserForm onUserCreated={() => {}} />
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <button
+          onClick={() => { setShowProducts(!showProducts); setEditingProduct(null); }}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
+        >
+          <span className="flex items-center gap-2">
+            <Package className="w-5 h-5" />
+            Gestionar Productos
+          </span>
+          {showProducts ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        </button>
+
+        {showProducts && (
+          <div className="mt-4 space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Productos Existentes</h3>
+              {products.length === 0 ? (
+                <p className="text-gray-500">No hay productos registrados.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left text-gray-500">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3">Nombre</th>
+                        <th className="px-4 py-3">Precio</th>
+                        <th className="px-4 py-3">Stock</th>
+                        <th className="px-4 py-3">Estado</th>
+                        <th className="px-4 py-3">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((p) => (
+                        <tr key={p.id} className="bg-white border-b">
+                          <td className="px-4 py-3 font-medium text-gray-900">{p.nombre}</td>
+                          <td className="px-4 py-3">S/ {p.precio.toFixed(2)}</td>
+                          <td className="px-4 py-3">{p.stock}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs ${p.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                              {p.activo ? 'Activo' : 'Inactivo'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => { setEditingProduct(p); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="max-w-md">
+              <ProductForm
+                product={editingProduct}
+                onProductSaved={() => { fetchProducts(); setEditingProduct(null); }}
+                onCancel={() => setEditingProduct(null)}
+              />
+            </div>
           </div>
         )}
       </div>

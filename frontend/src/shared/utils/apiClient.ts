@@ -48,6 +48,9 @@ export const apiClient = {
   async post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('POST', path, options, body);
   },
+  async put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+    return this.request<T>('PUT', path, options, body);
+  },
   async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', path, options, body);
   },
