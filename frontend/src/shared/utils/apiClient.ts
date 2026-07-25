@@ -54,6 +54,26 @@ export const apiClient = {
   async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', path, options, body);
   },
+  async upload<T>(path: string, formData: FormData, isRetry = false): Promise<T> {
+    const url = this.buildUrl(path);
+
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        ...this.getAuthHeaders(),
+      },
+      body: formData,
+    });
+
+    if (response.status === 401 && !isRetry && refreshAccessTokenFn) {
+      const newToken = await refreshAccessTokenFn();
+      if (newToken) {
+        return this.upload<T>(path, formData, true);
+      }
+    }
+
+    return this.handleResponse(response);
+  },
   async request<T>(method: string, path: string, options?: RequestOptions, body?: unknown, isRetry = false): Promise<T> {
     const { params, ...fetchOptions } = options || {};
     const url = this.buildUrl(path, params);

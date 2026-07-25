@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input, Button } from '../../../shared/components/iu';
 import { useCategories } from '../hooks/useCategories';
 import { createProduct, updateProduct } from '../services/product.service';
+import { apiClient } from '../../../shared/utils/apiClient';
 import type { CreateProductPayload } from '../types/product.types';
+import { Image, X } from 'lucide-react';
 
 interface ProductFormProps {
   product?: {
@@ -23,6 +25,7 @@ const PLACEHOLDER_IMAGE = "https://buenazo.cronosmedia.glr.pe/original/2020/08/3
 
 export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSaved, onCancel }) => {
   const { categories, loading: categoriesLoading } = useCategories();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -33,6 +36,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
   const [activo, setActivo] = useState(true);
 
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -60,6 +64,47 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
     setCategoriaId('');
     setImgUrl('');
     setActivo(true);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Solo se permiten archivos JPEG, PNG o WEBP');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('El archivo no debe superar los 5MB');
+      return;
+    }
+
+    setError(null);
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const result = await apiClient.upload<{ imageUrl: string }>('/api/upload', formData);
+      setImgUrl(result.imageUrl);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al subir la imagen';
+      setError(message);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImgUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,26 +216,58 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
           </select>
         </div>
 
-        <Input
-          label="URL de imagen"
-          type="text"
-          value={imgUrl}
-          onChange={(e) => setImgUrl(e.target.value)}
-          placeholder="https://ejemplo.com/imagen.jpg"
-        />
+        <div className="flex flex-col">
+          <label className="text-sm font-medium text-gray-700 mb-1">
+            Imagen del producto
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
 
-        {imgUrl && (
-          <div className="mt-2">
-            <img
-              src={imgUrl}
-              alt="Vista previa"
-              className="w-full h-40 object-cover rounded-md border border-gray-200"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
-              }}
-            />
-          </div>
-        )}
+          {imgUrl ? (
+            <div className="relative">
+              <img
+                src={imgUrl}
+                alt="Vista previa"
+                className="w-full h-40 object-cover rounded-md border border-gray-200"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full h-40 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-colors disabled:opacity-50"
+            >
+              {uploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
+                  <span className="text-sm text-gray-500">Subiendo imagen...</span>
+                </>
+              ) : (
+                <>
+                  <Image className="w-8 h-8 text-gray-400" />
+                  <span className="text-sm text-gray-500">Seleccionar imagen</span>
+                  <span className="text-xs text-gray-400">JPEG, PNG o WEBP (máx. 5MB)</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center gap-2">
           <input
@@ -217,7 +294,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
           <Button
             type="submit"
             gradient={true}
-            disabled={loading}
+            disabled={loading || uploading}
             className="flex-1 py-2 rounded-lg font-bold shadow-md"
           >
             {loading ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Crear Producto'}

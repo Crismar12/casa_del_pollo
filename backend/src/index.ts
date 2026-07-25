@@ -15,6 +15,7 @@ import authRoutes from './routes/auth.routes';
 import clientRoutes from './routes/client.routes';
 import orderRoutes from './routes/order.routes';
 import adminDashboardRoutes from './routes/adminDashboard.routes';
+import uploadRoutes from './routes/upload.routes';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminDashboardRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');

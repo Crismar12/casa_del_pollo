@@ -1,59 +1,13 @@
-import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm } from '../features/admin/components';
-import { ProductForm, CategoryForm } from '../features/products/components';
-import { getProductos } from '../features/products/services/product.service';
-import { getCategories } from '../features/products/services/category.service';
-import React, { useState, useEffect, useCallback } from 'react';
+import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories } from '../features/admin/components';
+import React, { useState } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
-import { RefreshCw, Users, ChevronDown, ChevronUp, Package, Pencil, Tag } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Package, Tag, Users } from 'lucide-react';
+
+type TabType = 'dashboard' | 'productos' | 'categorias' | 'usuarios';
 
 export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
-  const [showUsers, setShowUsers] = useState(false);
-  const [showProducts, setShowProducts] = useState(false);
-  const [products, setProducts] = useState<Array<{
-    id: string;
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    stock: number;
-    imageUrl?: string;
-    categoria_id?: number | null;
-    activo: boolean;
-  }>>([]);
-  const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
-  const [showCategories, setShowCategories] = useState(false);
-  const [categories, setCategories] = useState<Array<{ id: string; nombre: string; descripcion?: string }>>([]);
-  const [editingCategory, setEditingCategory] = useState<typeof categories[0] | null>(null);
-
-  const fetchProducts = useCallback(async () => {
-    try {
-      const data = await getProductos();
-      setProducts(data);
-    } catch (err) {
-      console.error('Error fetching products:', err);
-    }
-  }, []);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data);
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showProducts) {
-      fetchProducts();
-    }
-  }, [showProducts, fetchProducts]);
-
-  useEffect(() => {
-    if (showCategories) {
-      fetchCategories();
-    }
-  }, [showCategories, fetchCategories]);
+  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
   if (loading) {
     return (
@@ -71,9 +25,7 @@ export const AdminPage = () => {
     );
   }
 
-
   const formatPercentage = (value: number) => `${value.toFixed(2)}%`;
-
 
   const getComparisonFooter = (todayValue: number, yesterdayValue: number, unit: string = '', isCurrency: boolean = false) => {
     const formatValue = (value: number) => {
@@ -91,7 +43,6 @@ export const AdminPage = () => {
     const percentage = (difference / yesterdayValue) * 100;
     const sign = percentage >= 0 ? '+' : '';
 
-    
     if (Math.abs(percentage) < 0.5) { 
       return `0% que ayer`;
     }
@@ -99,10 +50,17 @@ export const AdminPage = () => {
     return `${sign}${percentage.toFixed(0)}% que ayer`;
   };
 
+  const tabs = [
+    { id: 'dashboard' as TabType, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'productos' as TabType, label: 'Productos', icon: Package },
+    { id: 'categorias' as TabType, label: 'Categorías', icon: Tag },
+    { id: 'usuarios' as TabType, label: 'Usuarios', icon: Users },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">Panel de Administración</h1>
         <button
           onClick={refetch}
           disabled={loading}
@@ -113,186 +71,75 @@ export const AdminPage = () => {
           Actualizar
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <TarjetaDashboard
-          title="Ventas hoy"
-          value={`S/ ${summary?.salesToday.toFixed(2) || '0.00'}`}
-          footer={getComparisonFooter(summary?.salesToday || 0, summary?.salesYesterday || 0, 'ventas', true)}
-          color="gradient"
-        />
-        <TarjetaDashboard
-          title="Pedidos Hoy"
-          value={summary?.ordersToday.toString() || '0'}
-          footer={getComparisonFooter(summary?.ordersToday || 0, summary?.ordersYesterday || 0, 'pedidos', false)}
-          color="white"
-        />
-        <TarjetaDashboard
-          title="Ticket promedio"
-          value={`S/ ${summary?.averageTicket.toFixed(2) || '0.00'}`}
-          footer={getComparisonFooter(summary?.averageTicket || 0, summary?.averageTicketYesterday || 0, 'ticket', true)}
-          color="gradient"
-        />
-        <TarjetaDashboard
-          title="Tasa de cancelación"
-          value={formatPercentage(summary?.cancellationRate || 0)}
-          footer="De todas las ventas" 
-          color="white"
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <PedidosRecientes />
-        <ProductosMasVendidos />
-      </div>
-      <div className="w-full">
-        <ResumenSemanal />
+
+      <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-200">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              activeTab === tab.id
+                ? 'border-red-600 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <tab.icon className="w-5 h-5" />
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <div className="mt-8">
-        <button
-          onClick={() => setShowUsers(!showUsers)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
-        >
-          <span className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Gestionar Usuarios
-          </span>
-          {showUsers ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
-
-        {showUsers && (
-          <div className="mt-4 max-w-md">
-            <UserForm onUserCreated={() => {}} />
+      {activeTab === 'dashboard' && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <TarjetaDashboard
+              title="Ventas hoy"
+              value={`S/ ${summary?.salesToday.toFixed(2) || '0.00'}`}
+              footer={getComparisonFooter(summary?.salesToday || 0, summary?.salesYesterday || 0, 'ventas', true)}
+              color="gradient"
+            />
+            <TarjetaDashboard
+              title="Pedidos Hoy"
+              value={summary?.ordersToday.toString() || '0'}
+              footer={getComparisonFooter(summary?.ordersToday || 0, summary?.ordersYesterday || 0, 'pedidos', false)}
+              color="white"
+            />
+            <TarjetaDashboard
+              title="Ticket promedio"
+              value={`S/ ${summary?.averageTicket.toFixed(2) || '0.00'}`}
+              footer={getComparisonFooter(summary?.averageTicket || 0, summary?.averageTicketYesterday || 0, 'ticket', true)}
+              color="gradient"
+            />
+            <TarjetaDashboard
+              title="Tasa de cancelación"
+              value={formatPercentage(summary?.cancellationRate || 0)}
+              footer="De todas las ventas" 
+              color="white"
+            />
           </div>
-        )}
-      </div>
-
-      <div className="mt-4">
-        <button
-          onClick={() => { setShowProducts(!showProducts); setEditingProduct(null); }}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
-        >
-          <span className="flex items-center gap-2">
-            <Package className="w-5 h-5" />
-            Gestionar Productos
-          </span>
-          {showProducts ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
-
-        {showProducts && (
-          <div className="mt-4 space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Productos Existentes</h3>
-              {products.length === 0 ? (
-                <p className="text-gray-500">No hay productos registrados.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3">Nombre</th>
-                        <th className="px-4 py-3">Precio</th>
-                        <th className="px-4 py-3">Stock</th>
-                        <th className="px-4 py-3">Estado</th>
-                        <th className="px-4 py-3">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((p) => (
-                        <tr key={p.id} className="bg-white border-b">
-                          <td className="px-4 py-3 font-medium text-gray-900">{p.nombre}</td>
-                          <td className="px-4 py-3">S/ {p.precio.toFixed(2)}</td>
-                          <td className="px-4 py-3">{p.stock}</td>
-                          <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded-full text-xs ${p.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {p.activo ? 'Activo' : 'Inactivo'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => { setEditingProduct(p); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            <div className="max-w-md">
-              <ProductForm
-                product={editingProduct}
-                onProductSaved={() => { fetchProducts(); setEditingProduct(null); }}
-                onCancel={() => setEditingProduct(null)}
-              />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PedidosRecientes />
+            <ProductosMasVendidos />
           </div>
-        )}
-      </div>
-
-      <div className="mt-4">
-        <button
-          onClick={() => { setShowCategories(!showCategories); setEditingCategory(null); }}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors w-full justify-between"
-        >
-          <span className="flex items-center gap-2">
-            <Tag className="w-5 h-5" />
-            Gestionar Categorías
-          </span>
-          {showCategories ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
-
-        {showCategories && (
-          <div className="mt-4 space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Categorías Existentes</h3>
-              {categories.length === 0 ? (
-                <p className="text-gray-500">No hay categorías registradas.</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3">Nombre</th>
-                        <th className="px-4 py-3">Descripción</th>
-                        <th className="px-4 py-3">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categories.map((c) => (
-                        <tr key={c.id} className="bg-white border-b">
-                          <td className="px-4 py-3 font-medium text-gray-900">{c.nombre}</td>
-                          <td className="px-4 py-3 text-gray-500">{c.descripcion || '-'}</td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() => { setEditingCategory(c); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            <div className="max-w-md">
-              <CategoryForm
-                category={editingCategory}
-                onCategorySaved={() => { fetchCategories(); setEditingCategory(null); }}
-                onCancel={() => setEditingCategory(null)}
-              />
-            </div>
+          <div className="w-full">
+            <ResumenSemanal />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {activeTab === 'productos' && (
+        <AdminProducts />
+      )}
+
+      {activeTab === 'categorias' && (
+        <AdminCategories />
+      )}
+
+      {activeTab === 'usuarios' && (
+        <div className="max-w-md">
+          <UserForm onUserCreated={() => {}} />
+        </div>
+      )}
     </div>
   );
 };
