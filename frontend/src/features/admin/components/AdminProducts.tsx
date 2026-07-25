@@ -183,7 +183,7 @@ export const AdminProducts: React.FC = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-900">{product.nombre}</td>
-                  <td className="px-4 py-3">S/ {product.precio.toFixed(2)}</td>
+                  <td className="px-4 py-3">S/ {Number(product.precio).toFixed(2)}</td>
                   <td className="px-4 py-3">{product.stock}</td>
                   <td className="px-4 py-3">
                     {categories.find(c => c.id === product.categoria_id?.toString())?.nombre || '-'}

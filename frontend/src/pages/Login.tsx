@@ -93,6 +93,16 @@ export default function Login() {
             {generalError}
           </p>
         )}
+
+        <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-left">
+          <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2">
+            Credenciales de demostración
+          </p>
+          <div className="space-y-1 text-sm text-gray-700">
+            <p><span className="font-semibold">Admin:</span> admin@demo.com / admin123</p>
+            <p><span className="font-semibold">Vendedor:</span> vendedor@demo.com / vend123</p>
+          </div>
+        </div>
       </div>
     </div>
   );

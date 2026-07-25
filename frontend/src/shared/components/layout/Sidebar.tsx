@@ -1,16 +1,19 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, ShoppingCart, ClipboardList, UserCog} from "lucide-react"; 
+import { useAuth } from "../../hooks/useAuth";
 
-
-const links = [
+const allLinks = [
   { to: "/", text: "Menú", icon: Menu },
   { to: "/carrito", text: "Carrito", icon: ShoppingCart },
   { to: "/pedidos", text: "Pedidos", icon: ClipboardList },
-  { to: "/admin", text: "Admin", icon: UserCog },
+  { to: "/admin", text: "Admin", icon: UserCog, adminOnly: true },
 ];
 
 export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; onLogoutClick: () => void; isDesktop: boolean }> = ({ isOpen, onLinkClick, onLogoutClick, isDesktop }) => {
+  const { usuario } = useAuth();
+  const links = allLinks.filter(link => !link.adminOnly || usuario?.rol === 'admin');
+
   return (
     <div
       className={`p-6 z-20 transition-all duration-300 ease-in-out bg-white flex flex-col justify-between h-[calc(100vh-4rem)] fixed top-16 left-0

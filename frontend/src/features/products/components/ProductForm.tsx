@@ -151,7 +151,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">
         {isEditing ? 'Editar Producto' : 'Agregar Producto'}
       </h3>
@@ -233,7 +233,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
               <img
                 src={imgUrl}
                 alt="Vista previa"
-                className="w-full h-40 object-cover rounded-md border border-gray-200"
+                className="w-full h-40 object-contain rounded-md border border-gray-200"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
                 }}
