@@ -19,4 +19,21 @@ export interface DashboardSummary {
   salesYesterday: number;
   ordersYesterday: number;
   averageTicketYesterday: number;
+  weeklyComparison: WeeklyComparison;
+  topCategory: TopCategory;
+}
+
+export interface WeeklyComparison {
+  thisWeekSales: number;
+  lastWeekSales: number;
+  thisWeekOrders: number;
+  lastWeekOrders: number;
+  salesChange: number;
+  ordersChange: number;
+}
+
+export interface TopCategory {
+  name: string;
+  totalSales: number;
+  orderCount: number;
 }

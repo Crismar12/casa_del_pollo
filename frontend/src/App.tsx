@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { AppHeader } from "./shared/components/layout/Header";
 import { AppSidebar } from "./shared/components/layout/Sidebar";
+import { AppFooter } from "./shared/components/layout/Footer";
 
 import { Notification } from './shared/components/Notification';
 import { useNotificationContext } from './shared/context/NotificationContext';
@@ -62,6 +63,7 @@ function App() {
           </div>
         </main>
       </div>
+      <AppFooter />
       <Notification
         show={notification.show}
         message={notification.message}

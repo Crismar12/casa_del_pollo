@@ -221,6 +221,17 @@ npm run dev
 - **Orders** - Order history and tracking
 - **Admin** - Admin panel with sales dashboard
 
+## Image Licensing
+
+Product images used in this project are sourced from [Unsplash](https://unsplash.com) under the [Unsplash License](https://unsplash.com/license), which permits free use for commercial and non-commercial purposes without attribution (though credit is appreciated).
+
+Images are uploaded and served via Cloudinary. The Cloudinary URL does not reflect the original source, so this section documents the licensing for transparency and compliance.
+
+- **Source:** [Unsplash](https://unsplash.com)
+- **License:** https://unsplash.com/license (free for commercial use, no attribution required)
+
+---
+
 ## Development Technologies
 
 - ESLint - Code linting

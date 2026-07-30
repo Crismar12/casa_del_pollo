@@ -31,4 +31,14 @@ export const adminDashboardService = {
       return null;
     }
   },
+
+  async resetDemoData(): Promise<boolean> {
+    try {
+      await apiClient.post("/api/admin/reset", {});
+      return true;
+    } catch (error: unknown) {
+      console.error("Error al restablecer datos de demo:", error instanceof Error ? error.message : error);
+      return false;
+    }
+  },
 };

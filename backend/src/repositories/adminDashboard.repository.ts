@@ -150,4 +150,71 @@ export const adminDashboardRepository = {
     );
     return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
   },
+
+  async getWeeklyComparison(): Promise<{
+    thisWeekSales: number;
+    lastWeekSales: number;
+    thisWeekOrders: number;
+    lastWeekOrders: number;
+    salesChange: number;
+    ordersChange: number;
+  }> {
+    const today = new Date();
+    const thisMonday = new Date(today);
+    thisMonday.setDate(today.getDate() - today.getDay() + 1);
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setDate(thisMonday.getDate() - 7);
+    const lastSunday = new Date(thisMonday);
+    lastSunday.setDate(thisMonday.getDate() - 1);
+
+    const thisWeekStart = thisMonday.toISOString().split('T')[0];
+    const lastWeekStart = lastMonday.toISOString().split('T')[0];
+    const lastWeekEnd = lastSunday.toISOString().split('T')[0];
+
+    const thisWeekResult = await db.query(
+      "SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1",
+      [thisWeekStart]
+    );
+    const lastWeekResult = await db.query(
+      "SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND fecha <= $2",
+      [lastWeekStart, lastWeekEnd]
+    );
+
+    const thisWeekSales = parseFloat(thisWeekResult.rows[0].sales) || 0;
+    const lastWeekSales = parseFloat(lastWeekResult.rows[0].sales) || 0;
+    const thisWeekOrders = parseInt(thisWeekResult.rows[0].orders, 10) || 0;
+    const lastWeekOrders = parseInt(lastWeekResult.rows[0].orders, 10) || 0;
+
+    const salesChange = lastWeekSales > 0
+      ? parseFloat(((thisWeekSales - lastWeekSales) / lastWeekSales * 100).toFixed(1))
+      : thisWeekSales > 0 ? 100 : 0;
+    const ordersChange = lastWeekOrders > 0
+      ? parseFloat(((thisWeekOrders - lastWeekOrders) / lastWeekOrders * 100).toFixed(1))
+      : thisWeekOrders > 0 ? 100 : 0;
+
+    return { thisWeekSales, lastWeekSales, thisWeekOrders, lastWeekOrders, salesChange, ordersChange };
+  },
+
+  async getTopCategory(): Promise<{ name: string; totalSales: number; orderCount: number }> {
+    const result = await db.query(
+      `SELECT c.nombre, COALESCE(SUM(dp.subtotal), 0) AS total_sales, COUNT(DISTINCT p.idpedido) AS order_count
+       FROM categorias c
+       LEFT JOIN producto pr ON pr.categoria_id = c.idcategoria
+       LEFT JOIN detallepedido dp ON dp.idproducto = pr.idproducto
+       LEFT JOIN pedido p ON p.idpedido = dp.idpedido
+       GROUP BY c.idcategoria, c.nombre
+       ORDER BY total_sales DESC
+       LIMIT 1`
+    );
+
+    if (result.rows.length === 0) {
+      return { name: 'N/A', totalSales: 0, orderCount: 0 };
+    }
+
+    return {
+      name: result.rows[0].nombre,
+      totalSales: parseFloat(result.rows[0].total_sales) || 0,
+      orderCount: parseInt(result.rows[0].order_count, 10) || 0,
+    };
+  },
 };

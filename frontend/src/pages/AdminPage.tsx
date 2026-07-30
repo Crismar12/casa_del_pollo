@@ -1,4 +1,4 @@
-import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories } from '../features/admin/components';
+import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories, DemoBanner } from '../features/admin/components';
 import React, { useState } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
 import { RefreshCw, LayoutDashboard, Package, Tag, Users } from 'lucide-react';
@@ -91,7 +91,8 @@ export const AdminPage = () => {
 
       {activeTab === 'dashboard' && (
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <DemoBanner onResetComplete={refetch} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <TarjetaDashboard
               title="Ventas hoy"
               value={`S/ ${summary?.salesToday.toFixed(2) || '0.00'}`}
@@ -114,6 +115,18 @@ export const AdminPage = () => {
               title="Tasa de cancelación"
               value={formatPercentage(summary?.cancellationRate || 0)}
               footer="De todas las ventas" 
+              color="white"
+            />
+            <TarjetaDashboard
+              title="Ventas esta semana"
+              value={`S/ ${summary?.weeklyComparison.thisWeekSales.toFixed(2) || '0.00'}`}
+              footer={`${summary?.weeklyComparison.salesChange ?? 0 >= 0 ? '+' : ''}${summary?.weeklyComparison.salesChange ?? 0}% vs semana pasada`}
+              color="gradient"
+            />
+            <TarjetaDashboard
+              title="Categoría top"
+              value={summary?.topCategory.name || 'N/A'}
+              footer={`S/ ${summary?.topCategory.totalSales.toFixed(2) || '0.00'} en ventas`}
               color="white"
             />
           </div>

@@ -6,6 +6,7 @@
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "hash-passwords": "ts-node -r tsconfig-paths/register src/scripts/hashExistingPasswords.ts",
     "hash-passwords:dry": "ts-node -r tsconfig-paths/register src/scripts/hashExistingPasswords.ts --dry-run",
+    "seed": "ts-node -r tsconfig-paths/register src/seed-cli.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +14,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@faker-js/faker": "^10.5.0",
     "@types/multer": "^2.2.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { Modal } from './Modal';
 import { useOrders } from '../../orders/hooks/useOrders';
 import { ORDER_STATUS, type Order, type OrderStatus } from '../../orders/types/order.types';
 import { getOrderDetails } from '../../orders/services/order.service';
 import { Button } from '../../../shared/components/iu';
 import { formatDateLocal, formatDateTimeLocal } from '../../../shared/utils/dateUtils';
+import { exportOrderToPdf } from './ExportOrderPdf';
 
 type PedidosRecientesProps = {
   title?: string;
@@ -85,12 +86,21 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => handleOpenModal(order)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <Eye className="w-5 h-5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenModal(order)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => exportOrderToPdf(order)}
+                      className="text-gray-500 hover:text-red-600"
+                      title="Exportar PDF"
+                    >
+                      <Download className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

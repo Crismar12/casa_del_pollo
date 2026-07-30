@@ -37,4 +37,12 @@ export const adminDashboardService = {
   async getAverageTicketYesterday(): Promise<number> {
     return adminDashboardRepository.getAverageTicketYesterday();
   },
+
+  async getWeeklyComparison() {
+    return adminDashboardRepository.getWeeklyComparison();
+  },
+
+  async getTopCategory() {
+    return adminDashboardRepository.getTopCategory();
+  },
 };

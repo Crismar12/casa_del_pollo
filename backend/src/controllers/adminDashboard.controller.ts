@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { adminDashboardService } from '../services/adminDashboard.service';
+import { db } from '../config/database';
+import { runSeed } from '../seed';
 
 export const adminDashboardController = {
   async getMostSoldProducts(req: Request, res: Response): Promise<void> {
@@ -33,6 +35,9 @@ export const adminDashboardController = {
       const ordersYesterday = await adminDashboardService.getOrdersYesterday();
       const averageTicketYesterday = await adminDashboardService.getAverageTicketYesterday();
 
+      const weeklyComparison = await adminDashboardService.getWeeklyComparison();
+      const topCategory = await adminDashboardService.getTopCategory();
+
       res.json({
         salesToday,
         ordersToday,
@@ -41,10 +46,25 @@ export const adminDashboardController = {
         salesYesterday,
         ordersYesterday,
         averageTicketYesterday,
+        weeklyComparison,
+        topCategory,
       });
     } catch (error: unknown) {
       console.error('Error in adminDashboardController.getDashboardSummary:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al obtener el resumen del dashboard' });
+    }
+  },
+
+  async resetDemoData(_req: Request, res: Response): Promise<void> {
+    const client = await db.connect();
+    try {
+      await runSeed(client);
+      res.json({ message: 'Datos de demo restablecidos exitosamente' });
+    } catch (error: unknown) {
+      console.error('Error in adminDashboardController.resetDemoData:', error instanceof Error ? error.message : error);
+      res.status(500).json({ error: 'Error al restablecer datos de demo' });
+    } finally {
+      client.release();
     }
   },
 };
