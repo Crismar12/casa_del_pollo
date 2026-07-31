@@ -23,7 +23,7 @@ export const useProducts = (selectedCategoryId?: string) => {
           id: item.idproducto.toString(),
           name: item.nombre,
           description: item.descripcion,
-          price: item.precio,
+          price: Number(item.precio),
           stock: item.stock,
           imageUrl: item.imageUrl || PLACEHOLDER_IMAGE_URL,
         }));

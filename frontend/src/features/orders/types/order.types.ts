@@ -22,4 +22,5 @@ export interface Order {
   status: OrderStatus;
   products: ProductInCart[];
   paymentMethod: string;
+  notas?: string;
 }

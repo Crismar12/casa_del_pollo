@@ -2,8 +2,8 @@ import { Pool, PoolClient } from 'pg';
 import bcrypt from 'bcrypt';
 import { v2 as cloudinary } from 'cloudinary';
 import { faker } from '@faker-js/faker';
-import https from 'https';
-import http from 'http';
+import fs from 'fs';
+import path from 'path';
 
 // ===================== CONFIG =====================
 
@@ -38,31 +38,31 @@ const PRODUCTS = [
   { nombre: 'Salchipapa Clásica', descripcion: 'Base de papas fritas crujientes con rodajas de hot dog tradicional.', precio: 16.00, stock: 50, categoria: 'Acompañamientos', imgKey: 'salchipapa' },
 
   // Categoria: Bebidas
-  { nombre: 'Inka Kola 1.5L', descripcion: 'Gaseosa Inka Kola tamaño familiar.', precio: 10.00, stock: 80, categoria: 'Bebidas', imgKey: 'inka-kola-familiar' },
-  { nombre: 'Coca Cola 1.5L', descripcion: 'Gaseosa Coca Cola tamaño familiar.', precio: 10.00, stock: 80, categoria: 'Bebidas', imgKey: 'coca-cola-familiar' },
-  { nombre: 'Jarra de Chicha Morada', descripcion: 'Chicha morada tradicional (1 Litro).', precio: 12.00, stock: 40, categoria: 'Bebidas', imgKey: 'chicha-morada' },
+  { nombre: 'Inka Kola personal', descripcion: 'Gaseosa Inka Kola 500ml.', precio: 7.50, stock: 80, categoria: 'Bebidas', imgKey: 'inka-kola' },
+  { nombre: 'Coca Cola personal', descripcion: 'Gaseosa Coca Cola 500ml', precio: 7.50, stock: 80, categoria: 'Bebidas', imgKey: 'coca-cola' },
+  { nombre: 'Vaso de Chicha Morada', descripcion: 'Chicha morada tradicional 500ml.', precio: 8.00, stock: 40, categoria: 'Bebidas', imgKey: 'chicha-morada' },
 
   // Categoria: Postres
   { nombre: 'Combinado Clásico', descripcion: 'Arroz con leche y mazamorra morada.', precio: 8.00, stock: 30, categoria: 'Postres', imgKey: 'combinado' },
   { nombre: 'Crema Volteada', descripcion: 'Porción de crema volteada tradicional.', precio: 8.00, stock: 20, categoria: 'Postres', imgKey: 'crema-volteada' },
 ];
 
-const UNSPLASH_IMAGES: Record<string, string> = {
-  'pollo-entero': 'https://images.unsplash.com/photo-1630564510761-a560db92a09b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cm90aXNzZXJpZSUyMGNoaWNrZW58ZW58MHx8MHx8fDA%3D',
-  'medio-pollo': 'https://images.unsplash.com/photo-1630564510791-1b8a156ec387?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'cuarto-pollo': 'https://images.unsplash.com/photo-1652545296821-09a023a9fd08?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cm9hc3RlZCUyMGNoaWNrZW4lMjBwaWVjZXxlbnwwfHwwfHx8MA%3D%3D',
-  'combo-familiar': 'https://images.unsplash.com/photo-1712579733874-c3a79f0f9d12?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'combo-pareja': 'https://images.unsplash.com/photo-1574672281340-6b2d260a4b72?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'mostrito': 'https://images.unsplash.com/photo-1772693471187-6e7d364f99ee?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'papas-fritas': 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'ensalada-clasica': 'https://images.unsplash.com/photo-1722032617357-7b09276b1a8d?q=80&w=1173&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'arroz-chaufa': 'https://images.unsplash.com/photo-1540100716001-4b432820e37f?q=80&w=1212&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'salchipapa': 'https://images.unsplash.com/photo-1762284513031-3d7ad15562bc?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'inka-kola-familiar': 'https://plus.unsplash.com/premium_photo-1695285406073-0424d330c075?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'coca-cola-familiar': 'https://plus.unsplash.com/premium_photo-1725075086631-b21a5642918b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'chicha-morada': 'https://images.unsplash.com/photo-1677253214134-31910eddfbe7?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'combinado': 'https://plus.unsplash.com/premium_photo-1675805763444-00dc665e689b?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  'crema-volteada': 'https://images.unsplash.com/photo-1702728109878-c61a98d80491?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+const SEED_IMAGES: Record<string, string> = {
+  'pollo-entero': '../seed-assets/pollo-entero.avif',
+  'medio-pollo': '../seed-assets/medio-pollo.avif',
+  'cuarto-pollo': '../seed-assets/cuarto-pollo.avif',
+  'combo-familiar': '../seed-assets/combo-familiar.avif',
+  'combo-pareja': '../seed-assets/combo-pareja.avif',
+  'mostrito': '../seed-assets/mostrito.avif',
+  'papas-fritas': '../seed-assets/papas-fritas.avif',
+  'ensalada-clasica': '../seed-assets/ensalada-clasica.avif',
+  'arroz-chaufa': '../seed-assets/arroz-chaufa.avif',
+  'salchipapa': '../seed-assets/salchipapa.avif',
+  'inka-kola': '../seed-assets/inka-cola.avif',
+  'coca-cola': '../seed-assets/coca-cola.avif',
+  'chicha-morada': '../seed-assets/chicha-morada.avif',
+  'combinado': '../seed-assets/combinado.avif',
+  'crema-volteada': '../seed-assets/crema-volteada.avif',
 };
 
 const ORDER_STATUSES = ['pendiente', 'en preparación', 'en reparto', 'entregado', 'cancelado'] as const;
@@ -86,22 +86,7 @@ function randomDate(daysAgo: number): Date {
   return new Date(now.getTime() - offset * 24 * 60 * 60 * 1000);
 }
 
-function downloadImage(url: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const client = url.startsWith('https') ? https : http;
-    client.get(url, (res) => {
-      if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return downloadImage(res.headers.location).then(resolve).catch(reject);
-      }
-      const chunks: Buffer[] = [];
-      res.on('data', (chunk: Buffer) => chunks.push(chunk));
-      res.on('end', () => resolve(Buffer.concat(chunks)));
-      res.on('error', reject);
-    }).on('error', reject);
-  });
-}
-
-async function uploadToCloudinary(buffer: Buffer, folder: string): Promise<string> {
+function uploadToCloudinary(buffer: Buffer, folder: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder, resource_type: 'image', transformation: [{ width: 600, height: 400, crop: 'fill' }] },
@@ -163,11 +148,12 @@ export async function runSeed(client: PoolClient): Promise<void> {
     const productPrices: number[] = [];
     for (const p of PRODUCTS) {
       let imgUrl = '';
-      const unsplashUrl = UNSPLASH_IMAGES[p.imgKey];
-      if (unsplashUrl) {
+      const seedImage = SEED_IMAGES[p.imgKey];
+      if (seedImage) {
         try {
-          console.log(`   ⬇️  Descargando ${p.imgKey}...`);
-          const buffer = await downloadImage(unsplashUrl);
+          const imagePath = path.resolve(__dirname, seedImage);
+          console.log(`   ⬆️  Subiendo ${p.imgKey}...`);
+          const buffer = await fs.promises.readFile(imagePath);
           imgUrl = await uploadToCloudinary(buffer, 'el-paraiso/productos');
           console.log(`   ✅ ${p.nombre} → ${imgUrl.substring(0, 50)}...`);
         } catch (err) {

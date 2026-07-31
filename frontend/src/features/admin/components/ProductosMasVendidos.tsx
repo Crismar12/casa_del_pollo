@@ -45,7 +45,7 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
     );
   }
 
-  const maxSales = Math.max(...products.map(p => p.salesAmount), 1);
+  const maxSales = Math.max(...products.map(p => p.revenue), 1);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -53,7 +53,7 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
       <div className="space-y-3">
         {products.map((product, index) => {
           const Icon = productIcons[product.category] || productIcons.Unknown;
-          const barWidth = (product.salesAmount / maxSales) * 100;
+          const barWidth = (product.revenue / maxSales) * 100;
           return (
             <div key={product.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
               <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
@@ -67,7 +67,9 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-medium text-gray-800 truncate">{product.name}</p>
-                  <span className="text-sm font-semibold text-gray-700 ml-2">{product.salesAmount} uds</span>
+                  <span className="text-sm font-semibold text-gray-700 ml-2">
+                    {product.salesAmount} uds · S/ {Number(product.revenue).toFixed(2)}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div

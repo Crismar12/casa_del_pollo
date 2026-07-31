@@ -28,6 +28,7 @@ interface BackendOrder {
 
 interface BackendOrderDetails extends BackendOrder {
   products: BackendProduct[];
+  notas?: string;
 }
 
 export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order | null> => {
@@ -63,7 +64,7 @@ export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit
     const mappedOrders: Order[] = response.orders.map(bOrder => ({
       id: bOrder.idpedido.toString(),
       client: bOrder.nombrecliente,
-      total: bOrder.total,
+      total: Number(bOrder.total),
       createdAt: bOrder.fecha,
       status: bOrder.estado,
       products: [], 
@@ -85,15 +86,16 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
     const mappedOrder: Order = {
       id: orderDetails.idpedido.toString(),
       client: orderDetails.nombrecliente,
-      total: orderDetails.total,
+      total: Number(orderDetails.total),
       createdAt: orderDetails.fecha,
       status: orderDetails.estado,
+      notas: orderDetails.notas,
       products: orderDetails.products.map((p: BackendProduct) => ({
         id: p.idproducto.toString(),
         name: p.name,
         description: '',
         quantity: p.quantity,
-        price: p.price,
+        price: Number(p.price),
         stock: 0,
       })),
       paymentMethod: "Efectivo",

@@ -3,6 +3,7 @@ export interface MostSoldProduct {
   name: string;
   category: string;
   salesAmount: number;
+  revenue: number;
   percentage?: number;
 }
 

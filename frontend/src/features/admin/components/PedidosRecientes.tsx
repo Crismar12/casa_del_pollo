@@ -79,7 +79,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                 </th>
                 <td className="px-6 py-4">{order.client}</td>
                 <td className="px-6 py-4">{formatDateLocal(order.createdAt)}</td>
-                <td className="px-6 py-4">S/ {order.total.toFixed(2)}</td>
+                <td className="px-6 py-4">S/ {Number(order.total).toFixed(2)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 rounded-full text-xs ${statusColors[order.status]}`}>
                     {order.status}
@@ -169,7 +169,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
 
                 <div className="bg-red-100 bg-opacity-50 p-3 rounded-lg mb-4 text-center">
                   <p className="text-sm text-red-800">Total</p>
-                  <p className="text-2xl font-bold text-red-800">S/ {selectedOrder.total.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-red-800">S/ {Number(selectedOrder.total).toFixed(2)}</p>
                 </div>
               </div>
 
@@ -183,6 +183,13 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                   ))}
                 </ul>
               </div>
+
+              {selectedOrder.notas && (
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg mb-4">
+                  <p className="text-sm text-amber-700 mb-1 font-medium">Notas del pedido</p>
+                  <p className="text-black">{selectedOrder.notas}</p>
+                </div>
+              )}
 
               <div className="flex flex-col items-center mt-4">
                 <p className="text-sm text-gray-500 mb-2">Cambiar Estado:</p>

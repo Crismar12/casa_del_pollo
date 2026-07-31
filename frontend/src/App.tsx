@@ -68,6 +68,7 @@ function App() {
         show={notification.show}
         message={notification.message}
         type={notification.type}
+        action={notification.action}
         onClose={hideNotification}
       />
     </div>

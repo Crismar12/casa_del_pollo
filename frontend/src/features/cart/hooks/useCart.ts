@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { addProduct, removeProduct } from '../store/cartSlice';
 import type { RootState } from '../../../store';
 import type { Product } from "../../products/types/product.types";
@@ -6,12 +7,22 @@ import { useNotificationContext } from '../../../shared/context/NotificationCont
 
 export const useCart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const { showNotification } = useNotificationContext();
 
-  const handleAddProduct = (product: Product) => {
+  const handleAddProduct = (product: Product, options?: { showCartAction?: boolean; duration?: number }) => {
     dispatch(addProduct(product));
-    showNotification(`Producto ${product.name} agregado al carrito!`, 'success');
+    const showCartAction = options?.showCartAction ?? true;
+
+    if (showCartAction) {
+      showNotification(`Producto ${product.name} agregado al carrito!`, 'success', {
+        label: 'Ir al carrito',
+        onClick: () => navigate('/carrito'),
+      });
+    } else {
+      showNotification(`Producto ${product.name} agregado`, 'success', undefined, options?.duration);
+    }
   };
 
   const handleRemoveProduct = (productId: string) => {

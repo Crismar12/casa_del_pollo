@@ -19,7 +19,7 @@ export const CartView = () => {
 
     const handleUpdateQuantity = (product: Product, delta: number) => {
         if (delta > 0) {
-            addProduct(product);
+            addProduct(product, { showCartAction: false, duration: 2500 });
         } else {
             removeProduct(product.id);
         }
@@ -97,7 +97,7 @@ export const CartView = () => {
                                             {item.description}
                                         </p>
                                         <p className="text-red-600 font-bold">
-                                            S/ {item.price.toFixed(2)}
+                                            S/ {Number(item.price).toFixed(2)}
                                         </p>
                                     </div>
                                     <div className="flex items-center space-x-3">
@@ -141,7 +141,7 @@ export const CartView = () => {
                                                 {item.name} x{item.quantity}
                                             </span>
                                             <span>
-                                                S/ {(item.price * item.quantity).toFixed(2)}
+                                                S/ {(Number(item.price) * item.quantity).toFixed(2)}
                                             </span>
                                         </div>
                                     ))}
@@ -150,7 +150,7 @@ export const CartView = () => {
                                     <div className="flex justify-between text-xl font-bold">
                                         <span>Total:</span>
                                         <span className="text-red-600">
-                                            S/ {cartTotal.toFixed(2)}
+                                            S/ {Number(cartTotal).toFixed(2)}
                                         </span>
                                     </div>
                                 </div>

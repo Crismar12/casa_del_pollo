@@ -7,7 +7,7 @@ export function exportOrderToPdf(order: Order): void {
 
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('El Pollo Dorado', 14, 22);
+  doc.text('El Paraíso del Pollo', 14, 22);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -43,8 +43,8 @@ export function exportOrderToPdf(order: Order): void {
   const tableData = order.products.map(p => [
     p.name,
     p.quantity.toString(),
-    `S/ ${p.price.toFixed(2)}`,
-    `S/ ${(p.price * p.quantity).toFixed(2)}`,
+    `S/ ${Number(p.price).toFixed(2)}`,
+    `S/ ${(Number(p.price) * p.quantity).toFixed(2)}`,
   ]);
 
   autoTable(doc, {
@@ -70,7 +70,7 @@ export function exportOrderToPdf(order: Order): void {
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('TOTAL:', 120, finalY + 10);
-  doc.text(`S/ ${order.total.toFixed(2)}`, 155, finalY + 10);
+  doc.text(`S/ ${Number(order.total).toFixed(2)}`, 155, finalY + 10);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');

@@ -7,7 +7,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3">
       <p className="text-sm font-medium text-gray-600 mb-1">{label}</p>
-      <p className="text-lg font-bold text-red-600">S/ {payload[0].value.toFixed(2)}</p>
+      <p className="text-lg font-bold text-red-600">S/ {Number(payload[0].value).toFixed(2)}</p>
     </div>
   );
 };

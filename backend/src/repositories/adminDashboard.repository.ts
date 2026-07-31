@@ -4,23 +4,21 @@ import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
     const detalleResult = await db.query(
-      'SELECT idproducto, cantidad FROM detallepedido'
+      `SELECT dp.idproducto,
+              SUM(dp.cantidad) AS sales_amount,
+              SUM(dp.subtotal) AS revenue
+       FROM detallepedido dp
+       GROUP BY dp.idproducto
+       ORDER BY revenue DESC
+       LIMIT $1`,
+      [limit]
     );
 
-    const aggregatedSales: { [key: number]: number } = {};
-    detalleResult.rows.forEach((item: { idproducto: number; cantidad: number }) => {
-      aggregatedSales[item.idproducto] = (aggregatedSales[item.idproducto] || 0) + item.cantidad;
-    });
-
-    const sortedProductSales = Object.entries(aggregatedSales)
-      .sort(([, countA], [, countB]) => (countB as number) - (countA as number))
-      .slice(0, limit);
-
-    const topProductIds = sortedProductSales.map(([id]) => parseInt(id));
-
-    if (topProductIds.length === 0) {
+    if (detalleResult.rows.length === 0) {
       return [];
     }
+
+    const topProductIds = detalleResult.rows.map((row: { idproducto: string }) => Number(row.idproducto));
 
     const productsResult = await db.query(
       `SELECT p.idproducto, p.nombre, p.categoria_id, c.nombre AS categoria_nombre
@@ -30,20 +28,25 @@ export const adminDashboardRepository = {
       [topProductIds]
     );
 
-    const totalSalesAmount = Object.values(aggregatedSales).reduce((sum, count) => sum + (count as number), 0);
+    const totalRevenue = detalleResult.rows.reduce(
+      (sum: number, row: { revenue: string }) => sum + Number(row.revenue),
+      0
+    );
 
-    const result: MostSoldProduct[] = sortedProductSales.map(([id, salesAmount]) => {
-      const product = productsResult.rows.find((p: { idproducto: number }) => p.idproducto === parseInt(id));
+    return detalleResult.rows.map((row: { idproducto: string; sales_amount: string; revenue: string }) => {
+      const product = productsResult.rows.find(
+        (p: { idproducto: string }) => Number(p.idproducto) === Number(row.idproducto)
+      );
+      const revenue = Number(row.revenue);
       return {
         id: product?.idproducto.toString() || '',
-        name: product?.nombre || 'Unknown',
-        category: product?.categoria_nombre || 'Unknown',
-        salesAmount: salesAmount as number,
-        percentage: totalSalesAmount > 0 ? parseFloat(((salesAmount as number / totalSalesAmount) * 100).toFixed(2)) : 0,
+        name: product?.nombre || 'Desconocido',
+        category: product?.categoria_nombre || 'Sin categoría',
+        salesAmount: Number(row.sales_amount),
+        revenue,
+        percentage: totalRevenue > 0 ? parseFloat(((revenue / totalRevenue) * 100).toFixed(2)) : 0,
       };
     });
-
-    return result;
   },
 
   async getWeeklySalesSummary(): Promise<DailySalesData[]> {
@@ -55,14 +58,14 @@ export const adminDashboardRepository = {
     const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
 
     const result = await db.query(
-      'SELECT fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 ORDER BY fecha ASC',
+      'SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 ORDER BY fecha ASC',
       [sevenDaysAgoISO, todayISO]
     );
 
     const dailySalesMap: { [key: string]: number } = {};
-    result.rows.forEach((pedido: { fecha: string; total: number }) => {
+    result.rows.forEach((pedido: { fecha: string; total: string }) => {
       const day = pedido.fecha;
-      dailySalesMap[day] = (dailySalesMap[day] || 0) + pedido.total;
+      dailySalesMap[day] = (dailySalesMap[day] || 0) + Number(pedido.total);
     });
 
     const dailyResult: DailySalesData[] = [];
