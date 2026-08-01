@@ -8,8 +8,24 @@ interface OrderProduct {
   price: number;
 }
 
+export class OrderBusinessHoursError extends Error {
+  constructor() {
+    super('El restaurante está cerrado. Atendemos de 12:00 p.m. a 11:00 p.m.');
+    this.name = 'OrderBusinessHoursError';
+  }
+}
+
+const isWithinBusinessHours = (): boolean => {
+  const hour = new Date().getHours();
+  return hour >= 12 && hour < 23;
+};
+
 export const orderService = {
   async processNewOrder(payload: CreateOrderPayload): Promise<Pedido> {
+    if (!isWithinBusinessHours()) {
+      throw new OrderBusinessHoursError();
+    }
+
     const { clientId, userId, nombrecliente, direccion, notas, items } = payload;
 
     

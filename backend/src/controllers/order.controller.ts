@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { orderService } from '../services/order.service';
-import { CreateOrderPayload } from '../types/order.types';
+import { orderService, OrderBusinessHoursError } from '../services/order.service';
+import { CreateOrderPayload, OrderStatusLockedError } from '../types/order.types';
 
 export const orderController = {
   async createOrder(req: Request, res: Response): Promise<void> {
@@ -16,6 +16,10 @@ export const orderController = {
       const newOrder = await orderService.processNewOrder(orderPayload);
       res.status(201).json(newOrder);
     } catch (error: unknown) {
+      if (error instanceof OrderBusinessHoursError) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
       console.error('Error in orderController.createOrder:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al crear el pedido' });
     }
@@ -68,6 +72,10 @@ export const orderController = {
         res.status(404).json({ error: 'Order not found' });
       }
     } catch (error: unknown) {
+      if (error instanceof OrderStatusLockedError) {
+        res.status(409).json({ error: error.message });
+        return;
+      }
       console.error('Error in orderController.updateOrderStatus:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al actualizar el estado del pedido' });
     }

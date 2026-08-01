@@ -1,7 +1,7 @@
 import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories, DemoBanner } from '../features/admin/components';
 import React, { useState } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
-import { RefreshCw, LayoutDashboard, Package, Tag, Users } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Package, Tag, Users, Info } from 'lucide-react';
 
 type TabType = 'dashboard' | 'productos' | 'categorias' | 'usuarios';
 
@@ -21,6 +21,13 @@ export const AdminPage = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center text-red-500">
         <p>Error al cargar el resumen del dashboard: {error}</p>
+        <button
+          onClick={refetch}
+          className="mt-4 flex items-center gap-2 px-4 py-2 mx-auto bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Reintentar
+        </button>
       </div>
     );
   }
@@ -92,6 +99,12 @@ export const AdminPage = () => {
       {activeTab === 'dashboard' && (
         <div className="space-y-8">
           <DemoBanner onResetComplete={refetch} />
+          <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg px-4 py-3">
+            <Info className="w-5 h-5 mt-0.5 shrink-0" />
+            <p className="text-sm">
+              Las ventas y los gráficos relacionados consideran solo los pedidos con estado <strong>"entregado"</strong>.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <TarjetaDashboard
               title="Ventas hoy"

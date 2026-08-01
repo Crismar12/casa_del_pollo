@@ -27,6 +27,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [confirmStatus, setConfirmStatus] = useState<OrderStatus | null>(null);
 
   const handleOpenModal = async (order: Order) => {
     setModalLoading(true);
@@ -44,6 +45,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
+    setConfirmStatus(null);
   };
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
@@ -51,6 +53,21 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
       await updateStatus(selectedOrder.id, newStatus);
       setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
     }
+  };
+
+  const handleStatusClick = (status: OrderStatus) => {
+    if (status === ORDER_STATUS.DELIVERED) {
+      setConfirmStatus(status);
+      return;
+    }
+    handleStatusChange(status);
+  };
+
+  const handleConfirmStatusChange = () => {
+    if (confirmStatus) {
+      handleStatusChange(confirmStatus);
+    }
+    setConfirmStatus(null);
   };
 
   if (loading) return <div className="bg-white rounded-lg shadow-md p-6">Cargando pedidos...</div>;
@@ -192,31 +209,66 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
               )}
 
               <div className="flex flex-col items-center mt-4">
-                <p className="text-sm text-gray-500 mb-2">Cambiar Estado:</p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {Object.values(ORDER_STATUS).map((status) => {
-                    const isSelected = selectedOrder.status === status;
-                    const borderColorClass =
-                      status === ORDER_STATUS.PENDING ? 'border-orange-500' :
-                      status === ORDER_STATUS.PREPARING ? 'border-yellow-500' :
-                      status === ORDER_STATUS.DELIVERING ? 'border-blue-500' :
-                      status === ORDER_STATUS.DELIVERED ? 'border-green-500' :
-                      'border-red-500';
-
-                    return (
-                      <button
-                        key={status}
-                        onClick={() => handleStatusChange(status)}
-                        className={`px-3 py-1 rounded-md text-sm font-semibold
-                          ${statusColors[status]}
-                          ${isSelected ? `border-2 ${borderColorClass}` : 'border border-transparent'}
-                        `}
+                {selectedOrder.status === ORDER_STATUS.DELIVERED ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-center">
+                    <p className="text-sm font-semibold text-green-700">
+                      Pedido entregado — estado final, ya no se puede modificar.
+                    </p>
+                  </div>
+                ) : confirmStatus ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-center w-full">
+                    <p className="text-sm font-semibold text-amber-800 mb-1">
+                      ¿Quieres marcar este pedido como entregado?
+                    </p>
+                    <p className="text-xs text-amber-700 mb-4">
+                      Esta acción es irreversible: una vez entregado, no podrás volver a cambiar el estado del pedido.
+                    </p>
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        onClick={() => setConfirmStatus(null)}
+                        variant="secondary"
+                        className="px-4 py-2"
                       >
-                        {status}
-                      </button>
-                    );
-                  })}
-                </div>
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={handleConfirmStatusChange}
+                        variant="info"
+                        className="px-4 py-2"
+                      >
+                        Confirmar entrega
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-500 mb-2">Cambiar Estado:</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {Object.values(ORDER_STATUS).map((status) => {
+                        const isSelected = selectedOrder.status === status;
+                        const borderColorClass =
+                          status === ORDER_STATUS.PENDING ? 'border-orange-500' :
+                          status === ORDER_STATUS.PREPARING ? 'border-yellow-500' :
+                          status === ORDER_STATUS.DELIVERING ? 'border-blue-500' :
+                          status === ORDER_STATUS.DELIVERED ? 'border-green-500' :
+                          'border-red-500';
+
+                        return (
+                          <button
+                            key={status}
+                            onClick={() => handleStatusClick(status)}
+                            className={`px-3 py-1 rounded-md text-sm font-semibold
+                              ${statusColors[status]}
+                              ${isSelected ? `border-2 ${borderColorClass}` : 'border border-transparent'}
+                            `}
+                          >
+                            {status}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )

@@ -78,9 +78,7 @@ export const useAuth = () => {
     }
   }, [logout]);
 
-  useEffect(() => {
-    setRefreshTokenFn(refreshAccessToken);
-  }, [refreshAccessToken]);
+  setRefreshTokenFn(refreshAccessToken);
 
   return { usuario, loading, login, logout, getAccessToken, getRefreshToken, refreshAccessToken };
 };

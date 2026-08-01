@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { Order } from '../../orders/types/order.types';
+import { ORDER_STATUS, type Order } from '../../orders/types/order.types';
 
 export function exportOrderToPdf(order: Order): void {
   const doc = new jsPDF();
@@ -76,6 +76,12 @@ export function exportOrderToPdf(order: Order): void {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(150, 150, 150);
   doc.text('Gracias por su compra!', 105, finalY + 22, { align: 'center' });
+
+  if (order.status === ORDER_STATUS.DELIVERED) {
+    doc.setFontSize(8);
+    doc.setTextColor(190, 60, 60);
+    doc.text('No se aceptan devoluciones de los pedidos una vez que estos han sido entregados.', 105, finalY + 30, { align: 'center' });
+  }
 
   doc.save(`pedido-${order.id}.pdf`);
 }

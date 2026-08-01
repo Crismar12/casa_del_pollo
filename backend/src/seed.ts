@@ -65,6 +65,12 @@ const SEED_IMAGES: Record<string, string> = {
   'crema-volteada': '../seed-assets/crema-volteada.avif',
 };
 
+const SEED_IMAGE_FOLDER = 'el-paraiso/productos';
+const SEED_IMAGE_TRANSFORMATION: { width: number; height: number; crop: string }[] = [
+  { width: 600, height: 400, crop: 'fill' },
+];
+const SEED_FORCE_IMAGES = process.env.SEED_FORCE_IMAGES === '1';
+
 const ORDER_STATUSES = ['pendiente', 'en preparación', 'en reparto', 'entregado', 'cancelado'] as const;
 const STATUS_WEIGHTS = [0.15, 0.10, 0.10, 0.60, 0.05];
 
@@ -86,10 +92,34 @@ function randomDate(daysAgo: number): Date {
   return new Date(now.getTime() - offset * 24 * 60 * 60 * 1000);
 }
 
-function uploadToCloudinary(buffer: Buffer, folder: string): Promise<string> {
+function getExistingImage(publicId: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    cloudinary.api.resource(
+      publicId,
+      (error: unknown, result: { secure_url?: string } | undefined) => {
+        if (error || !result?.secure_url) return resolve(null);
+        resolve(result.secure_url);
+      }
+    );
+  });
+}
+
+function uploadToCloudinary(
+  buffer: Buffer,
+  folder: string,
+  publicId?: string,
+  overwrite = false
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: 'image', transformation: [{ width: 600, height: 400, crop: 'fill' }] },
+      {
+        folder,
+        public_id: publicId,
+        overwrite,
+        invalidate: overwrite,
+        resource_type: 'image',
+        transformation: SEED_IMAGE_TRANSFORMATION,
+      },
       (error, result) => {
         if (error) return reject(error);
         resolve(result!.secure_url);
@@ -99,12 +129,68 @@ function uploadToCloudinary(buffer: Buffer, folder: string): Promise<string> {
   });
 }
 
+async function cleanupOrphanSeedImages(): Promise<void> {
+  const canonical = new Set(
+    Object.keys(SEED_IMAGES).map((key) => `${SEED_IMAGE_FOLDER}/${key}`)
+  );
+  let nextCursor: string | undefined;
+  let deleted = 0;
+
+  do {
+    const params: Record<string, unknown> = {
+      type: 'upload',
+      prefix: `${SEED_IMAGE_FOLDER}/`,
+      max_results: 100,
+    };
+    if (nextCursor) params.next_cursor = nextCursor;
+
+    const result = await new Promise<{
+      resources?: { public_id: string }[];
+      next_cursor?: string;
+    }>((resolve, reject) => {
+      cloudinary.api.resources(params, (error: unknown, res: unknown) => {
+        if (error) return reject(error);
+        resolve(res as { resources?: { public_id: string }[]; next_cursor?: string });
+      });
+    });
+
+    for (const resource of result.resources ?? []) {
+      if (canonical.has(resource.public_id)) continue;
+      await new Promise<void>((resolve, reject) => {
+        cloudinary.uploader.destroy(resource.public_id, { invalidate: true }, (error: unknown) => {
+          if (error) return reject(error);
+          resolve();
+        });
+      });
+      console.log(`   🗑️  Imagen duplicada eliminada: ${resource.public_id}`);
+      deleted++;
+    }
+
+    nextCursor = result.next_cursor;
+  } while (nextCursor);
+
+  console.log(
+    deleted > 0
+      ? `   ✅ Se eliminaron ${deleted} imágenes duplicadas`
+      : '   ✅ No hay imágenes duplicadas en Cloudinary'
+  );
+}
+
 // ===================== SEED LOGIC =====================
 
 export async function runSeed(client: PoolClient): Promise<void> {
   await client.query('BEGIN');
 
   try {
+    console.log('🗑️  Limpiando imágenes duplicadas en Cloudinary...');
+    try {
+      await cleanupOrphanSeedImages();
+    } catch (err) {
+      console.warn(
+        `   ⚠️  No se pudieron limpiar las imágenes de Cloudinary: ${err instanceof Error ? err.message : err}`
+      );
+    }
+
     console.log('🗑️  Limpiando tablas...');
     await client.query('DELETE FROM detallepedido');
     await client.query('DELETE FROM pedido');
@@ -143,7 +229,7 @@ export async function runSeed(client: PoolClient): Promise<void> {
       console.log(`   ✅ ${c.nombre}`);
     }
 
-    console.log('🍗 Creando productos (subiendo imágenes a Cloudinary)...');
+    console.log('🍗 Creando productos (reutilizando/subiendo imágenes a Cloudinary)...');
     const productIds: number[] = [];
     const productPrices: number[] = [];
     for (const p of PRODUCTS) {
@@ -151,13 +237,20 @@ export async function runSeed(client: PoolClient): Promise<void> {
       const seedImage = SEED_IMAGES[p.imgKey];
       if (seedImage) {
         try {
-          const imagePath = path.resolve(__dirname, seedImage);
-          console.log(`   ⬆️  Subiendo ${p.imgKey}...`);
-          const buffer = await fs.promises.readFile(imagePath);
-          imgUrl = await uploadToCloudinary(buffer, 'el-paraiso/productos');
-          console.log(`   ✅ ${p.nombre} → ${imgUrl.substring(0, 50)}...`);
+          const publicId = `${SEED_IMAGE_FOLDER}/${p.imgKey}`;
+          const existingUrl = SEED_FORCE_IMAGES ? null : await getExistingImage(publicId);
+          if (existingUrl) {
+            imgUrl = existingUrl;
+            console.log(`   ↩️  Reutilizando ${p.imgKey} → ${existingUrl.substring(0, 50)}...`);
+          } else {
+            const imagePath = path.resolve(__dirname, seedImage);
+            console.log(`   ⬆️  Subiendo ${p.imgKey}...`);
+            const buffer = await fs.promises.readFile(imagePath);
+            imgUrl = await uploadToCloudinary(buffer, SEED_IMAGE_FOLDER, p.imgKey, SEED_FORCE_IMAGES);
+            console.log(`   ✅ ${p.nombre} → ${imgUrl.substring(0, 50)}...`);
+          }
         } catch (err) {
-          console.warn(`   ⚠️  Error subiendo imagen para ${p.nombre}: ${err}`);
+          console.warn(`   ⚠️  Error procesando imagen para ${p.nombre}: ${err}`);
         }
       }
 
@@ -192,7 +285,10 @@ export async function runSeed(client: PoolClient): Promise<void> {
       const fecha = isRecent ? randomDate(7) : randomDate(30);
       fecha.setDate(fecha.getDate() - (isRecent ? 0 : 7));
 
-      const estado = weightedRandom(ORDER_STATUSES, STATUS_WEIGHTS);
+      const isToday = fecha.toDateString() === new Date().toDateString();
+      const estado = isToday
+        ? weightedRandom(ORDER_STATUSES, STATUS_WEIGHTS)
+        : weightedRandom(['entregado', 'cancelado'] as const, [0.90, 0.10]);
       const clienteId = clientIds[Math.floor(Math.random() * clientIds.length)];
       const clienteName = faker.person.fullName();
 
@@ -200,10 +296,18 @@ export async function runSeed(client: PoolClient): Promise<void> {
       const usedIndices = new Set<number>();
       let total = 0;
 
+      const createdAt = new Date(
+        fecha.getFullYear(),
+        fecha.getMonth(),
+        fecha.getDate(),
+        12 + Math.floor(Math.random() * 11),
+        Math.floor(Math.random() * 60)
+      );
+
       const orderRes = await client.query(
-        `INSERT INTO pedido (fecha, estado, nombrecliente, direccion, notas, total, idcliente, idusuario)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING idpedido`,
-        [fecha.toISOString().split('T')[0], estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId]
+        `INSERT INTO pedido (fecha, created_at, estado, nombrecliente, direccion, notas, total, idcliente, idusuario)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING idpedido`,
+        [fecha.toISOString().split('T')[0], createdAt, estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId]
       );
       const pedidoId = orderRes.rows[0].idpedido;
 

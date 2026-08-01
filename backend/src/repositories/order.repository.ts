@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { Pedido, DetallePedido } from '../types/order.types';
+import { Pedido, DetallePedido, OrderStatusLockedError } from '../types/order.types';
 
 interface CreatePedidoPayload {
   idcliente: number;
@@ -74,7 +74,7 @@ export const orderRepository = {
     const countResult = await db.query(countQuery, countParams);
     const totalCount = parseInt(countResult.rows[0].count, 10);
 
-    dataQuery += ' ORDER BY fecha DESC, idpedido DESC';
+    dataQuery += ' ORDER BY created_at DESC, idpedido DESC';
     dataQuery += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
     params.push(limit, offset);
 
@@ -123,6 +123,13 @@ export const orderRepository = {
   },
 
   async updateOrderStatus(orderId: number, newStatus: string): Promise<Pedido | null> {
+    const current = await db.query('SELECT estado FROM pedido WHERE idpedido = $1', [orderId]);
+    if (current.rows.length === 0) return null;
+
+    if (current.rows[0].estado === 'entregado') {
+      throw new OrderStatusLockedError();
+    }
+
     const result = await db.query(
       'UPDATE pedido SET estado = $1 WHERE idpedido = $2 RETURNING *',
       [newStatus, orderId]

@@ -23,6 +23,7 @@ interface BackendOrder {
   nombrecliente: string;
   total: number;
   fecha: string;
+  created_at: string;
   estado: OrderStatus;
 }
 
@@ -65,7 +66,7 @@ export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit
       id: bOrder.idpedido.toString(),
       client: bOrder.nombrecliente,
       total: Number(bOrder.total),
-      createdAt: bOrder.fecha,
+      createdAt: bOrder.created_at,
       status: bOrder.estado,
       products: [], 
       paymentMethod: "Efectivo",
@@ -87,7 +88,7 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
       id: orderDetails.idpedido.toString(),
       client: orderDetails.nombrecliente,
       total: Number(orderDetails.total),
-      createdAt: orderDetails.fecha,
+      createdAt: orderDetails.created_at,
       status: orderDetails.estado,
       notas: orderDetails.notas,
       products: orderDetails.products.map((p: BackendProduct) => ({
@@ -108,13 +109,13 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
   }
 };
 
-export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus): Promise<Order | null> => {
+export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus): Promise<Order> => {
   try {
     const updatedOrder = await apiClient.patch<Order>(`/api/orders/${orderId}/status`, { status: newStatus });
     return updatedOrder;
   } catch (error: unknown) {
     console.error(`❌ Error al actualizar el estado del pedido ${orderId}:`, error instanceof Error ? error.message : error);
-    return null;
+    throw error;
   }
 };
 
