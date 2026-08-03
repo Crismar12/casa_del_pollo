@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { Modal } from './Modal';
 import { useOrders } from '../../orders/hooks/useOrders';
-import { ORDER_STATUS, type Order, type OrderStatus } from '../../orders/types/order.types';
+import { ORDER_STATUS, CANCEL_REASONS, type Order, type OrderStatus } from '../../orders/types/order.types';
 import { getOrderDetails } from '../../orders/services/order.service';
 import { Button } from '../../../shared/components/iu';
 import { formatDateLocal, formatDateTimeLocal } from '../../../shared/utils/dateUtils';
@@ -28,6 +28,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [confirmStatus, setConfirmStatus] = useState<OrderStatus | null>(null);
+  const [cancelReason, setCancelReason] = useState<string | null>(null);
 
   const handleOpenModal = async (order: Order) => {
     setModalLoading(true);
@@ -46,28 +47,35 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
     setIsModalOpen(false);
     setSelectedOrder(null);
     setConfirmStatus(null);
+    setCancelReason(null);
   };
 
-  const handleStatusChange = async (newStatus: OrderStatus) => {
+  const handleStatusChange = async (newStatus: OrderStatus, motivoCancelacion?: string) => {
     if (selectedOrder) {
-      await updateStatus(selectedOrder.id, newStatus);
-      setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
+      await updateStatus(selectedOrder.id, newStatus, motivoCancelacion);
+      setSelectedOrder(prev => prev ? { ...prev, status: newStatus, motivoCancelacion } : null);
     }
   };
 
   const handleStatusClick = (status: OrderStatus) => {
-    if (status === ORDER_STATUS.DELIVERED) {
+    if (status === ORDER_STATUS.DELIVERED || status === ORDER_STATUS.CANCELED) {
       setConfirmStatus(status);
+      setCancelReason(null);
       return;
     }
     handleStatusChange(status);
   };
 
   const handleConfirmStatusChange = () => {
-    if (confirmStatus) {
+    if (confirmStatus === ORDER_STATUS.CANCELED) {
+      if (cancelReason) {
+        handleStatusChange(ORDER_STATUS.CANCELED, cancelReason);
+      }
+    } else if (confirmStatus) {
       handleStatusChange(confirmStatus);
     }
     setConfirmStatus(null);
+    setCancelReason(null);
   };
 
   if (loading) return <div className="bg-white rounded-lg shadow-md p-6">Cargando pedidos...</div>;
@@ -215,7 +223,18 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                       Pedido entregado — estado final, ya no se puede modificar.
                     </p>
                   </div>
-                ) : confirmStatus ? (
+                ) : selectedOrder.status === ORDER_STATUS.CANCELED ? (
+                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center">
+                    <p className="text-sm font-semibold text-red-700">
+                      Pedido cancelado — estado final, ya no se puede modificar.
+                    </p>
+                    {selectedOrder.motivoCancelacion && (
+                      <p className="text-xs text-red-600 mt-1">
+                        Motivo: {selectedOrder.motivoCancelacion}
+                      </p>
+                    )}
+                  </div>
+                ) : confirmStatus === ORDER_STATUS.DELIVERED ? (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-center w-full">
                     <p className="text-sm font-semibold text-amber-800 mb-1">
                       ¿Quieres marcar este pedido como entregado?
@@ -237,6 +256,54 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                         className="px-4 py-2"
                       >
                         Confirmar entrega
+                      </Button>
+                    </div>
+                  </div>
+                ) : confirmStatus === ORDER_STATUS.CANCELED ? (
+                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center w-full">
+                    <p className="text-sm font-semibold text-red-800 mb-1">
+                      ¿Deseas cancelar este pedido?
+                    </p>
+                    <p className="text-xs text-red-600 mb-4">
+                      Esta acción es irreversible: una vez cancelado, no podrás volver a cambiar el estado del pedido. Selecciona el motivo de la cancelación.
+                    </p>
+                    <div className="flex flex-col gap-2 mb-4 text-left">
+                      {CANCEL_REASONS.map((reason) => (
+                        <label
+                          key={reason.value}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm cursor-pointer ${
+                            cancelReason === reason.value
+                              ? 'border-red-500 bg-red-100 text-red-900'
+                              : 'border-gray-300 text-gray-700 hover:border-red-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="cancelReason"
+                            value={reason.value}
+                            checked={cancelReason === reason.value}
+                            onChange={() => setCancelReason(reason.value)}
+                            className="accent-red-600"
+                          />
+                          {reason.label}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        onClick={() => setConfirmStatus(null)}
+                        variant="secondary"
+                        className="px-4 py-2"
+                      >
+                        Volver
+                      </Button>
+                      <Button
+                        onClick={handleConfirmStatusChange}
+                        disabled={!cancelReason}
+                        gradient
+                        className="px-4 py-2"
+                      >
+                        Confirmar cancelación
                       </Button>
                     </div>
                   </div>

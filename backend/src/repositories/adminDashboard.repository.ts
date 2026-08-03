@@ -1,6 +1,8 @@
 import { db } from '../config/database';
 import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
+const SALE_ORDER_FILTER = "(estado = 'entregado' OR (estado = 'cancelado' AND contabilizar_venta))";
+
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
     const detalleResult = await db.query(
@@ -8,7 +10,7 @@ export const adminDashboardRepository = {
               SUM(dp.cantidad) AS sales_amount,
               SUM(dp.subtotal) AS revenue
        FROM detallepedido dp
-       JOIN pedido p ON p.idpedido = dp.idpedido AND p.estado = 'entregado'
+       JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
        GROUP BY dp.idproducto
        ORDER BY revenue DESC
        LIMIT $1`,
@@ -59,7 +61,7 @@ export const adminDashboardRepository = {
     const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
 
     const result = await db.query(
-      "SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND estado = 'entregado' ORDER BY fecha ASC",
+      `SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER} ORDER BY fecha ASC`,
       [sevenDaysAgoISO, todayISO]
     );
 
@@ -87,7 +89,7 @@ export const adminDashboardRepository = {
   async getSalesToday(): Promise<number> {
     const today = new Date().toISOString().split('T')[0];
     const result = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [today]
     );
     return parseFloat(result.rows[0].total) || 0;
@@ -128,7 +130,7 @@ export const adminDashboardRepository = {
     const yesterdayISO = yesterday.toISOString().split('T')[0];
 
     const result = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [yesterdayISO]
     );
     return parseFloat(result.rows[0].total) || 0;
@@ -176,11 +178,11 @@ export const adminDashboardRepository = {
     const lastWeekEnd = lastSunday.toISOString().split('T')[0];
 
     const thisWeekResult = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND ${SALE_ORDER_FILTER}`,
       [thisWeekStart]
     );
     const lastWeekResult = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER}`,
       [lastWeekStart, lastWeekEnd]
     );
 
@@ -205,7 +207,7 @@ export const adminDashboardRepository = {
        FROM categorias c
        LEFT JOIN producto pr ON pr.categoria_id = c.idcategoria
        LEFT JOIN detallepedido dp ON dp.idproducto = pr.idproducto
-       LEFT JOIN pedido p ON p.idpedido = dp.idpedido AND p.estado = 'entregado'
+       LEFT JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
        GROUP BY c.idcategoria, c.nombre
        ORDER BY total_sales DESC
        LIMIT 1`

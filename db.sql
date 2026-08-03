@@ -70,6 +70,8 @@ create table if not exists public.pedido (
     on update cascade
     on delete restrict,
   created_at timestamptz not null default now(),
+  motivo_cancelacion text,
+  contabilizar_venta boolean not null default false,
   constraint pedido_estado_check
     check (estado in ('pendiente', 'en preparación', 'en reparto', 'entregado', 'cancelado'))
 );

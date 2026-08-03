@@ -4,6 +4,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
+import { CANCEL_REASONS } from './types/order.types';
 
 // ===================== CONFIG =====================
 
@@ -289,6 +290,14 @@ export async function runSeed(client: PoolClient): Promise<void> {
       const estado = isToday
         ? weightedRandom(ORDER_STATUSES, STATUS_WEIGHTS)
         : weightedRandom(['entregado', 'cancelado'] as const, [0.90, 0.10]);
+
+      let motivoCancelacion: string | null = null;
+      let contabilizarVenta = false;
+      if (estado === 'cancelado') {
+        const reason = CANCEL_REASONS[Math.floor(Math.random() * CANCEL_REASONS.length)];
+        motivoCancelacion = reason.motivo;
+        contabilizarVenta = reason.contabilizaVenta;
+      }
       const clienteId = clientIds[Math.floor(Math.random() * clientIds.length)];
       const clienteName = faker.person.fullName();
 
@@ -305,9 +314,9 @@ export async function runSeed(client: PoolClient): Promise<void> {
       );
 
       const orderRes = await client.query(
-        `INSERT INTO pedido (fecha, created_at, estado, nombrecliente, direccion, notas, total, idcliente, idusuario)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING idpedido`,
-        [fecha.toISOString().split('T')[0], createdAt, estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId]
+        `INSERT INTO pedido (fecha, created_at, estado, nombrecliente, direccion, notas, total, idcliente, idusuario, motivo_cancelacion, contabilizar_venta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING idpedido`,
+        [fecha.toISOString().split('T')[0], createdAt, estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId, motivoCancelacion, contabilizarVenta]
       );
       const pedidoId = orderRes.rows[0].idpedido;
 

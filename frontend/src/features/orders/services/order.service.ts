@@ -25,14 +25,14 @@ interface BackendOrder {
   fecha: string;
   created_at: string;
   estado: OrderStatus;
+  motivo_cancelacion?: string | null;
+  contabilizar_venta?: boolean | null;
 }
 
 interface BackendOrderDetails extends BackendOrder {
   products: BackendProduct[];
   notas?: string;
-}
-
-export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order | null> => {
+}export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order | null> => {
   try {
     const payload: CreateOrderFrontendPayload = {
       clientId: clientInfo.clientId,
@@ -70,6 +70,7 @@ export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit
       status: bOrder.estado,
       products: [], 
       paymentMethod: "Efectivo",
+      motivoCancelacion: bOrder.motivo_cancelacion ?? null,
     }));
 
     return { orders: mappedOrders, totalCount: response.totalCount };
@@ -91,6 +92,7 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
       createdAt: orderDetails.created_at,
       status: orderDetails.estado,
       notas: orderDetails.notas,
+      motivoCancelacion: orderDetails.motivo_cancelacion ?? null,
       products: orderDetails.products.map((p: BackendProduct) => ({
         id: p.idproducto.toString(),
         name: p.name,
@@ -109,13 +111,23 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
   }
 };
 
-export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus): Promise<Order> => {
+export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus, motivoCancelacion?: string): Promise<Order> => {
   try {
-    const updatedOrder = await apiClient.patch<Order>(`/api/orders/${orderId}/status`, { status: newStatus });
+    const updatedOrder = await apiClient.patch<Order>(`/api/orders/${orderId}/status`, { status: newStatus, motivoCancelacion });
     return updatedOrder;
   } catch (error: unknown) {
     console.error(`❌ Error al actualizar el estado del pedido ${orderId}:`, error instanceof Error ? error.message : error);
     throw error;
+  }
+};
+
+export const getActiveOrdersCount = async (): Promise<number> => {
+  try {
+    const data = await apiClient.get<{ count: number }>("/api/orders/active-count");
+    return Number(data.count);
+  } catch (error: unknown) {
+    console.error('❌ Error al obtener pedidos activos:', error instanceof Error ? error.message : error);
+    return 0;
   }
 };
 

@@ -1,3 +1,4 @@
+import geoip from 'geoip-lite';
 import { orderRepository } from '../repositories/order.repository';
 import { CreateOrderPayload, Pedido, DetallePedido } from '../types/order.types';
 
@@ -15,14 +16,30 @@ export class OrderBusinessHoursError extends Error {
   }
 }
 
-const isWithinBusinessHours = (): boolean => {
-  const hour = new Date().getHours();
+const DEFAULT_TIMEZONE = 'America/Lima';
+
+const getClientHour = (ip?: string): number => {
+  let timeZone = DEFAULT_TIMEZONE;
+  if (ip) {
+    const lookup = geoip.lookup(ip);
+    if (lookup?.timezone) timeZone = lookup.timezone;
+  }
+
+  const hour = parseInt(
+    new Intl.DateTimeFormat('en-US', { timeZone, hour: 'numeric', hour12: false }).format(new Date()),
+    10
+  );
+  return hour === 24 ? 0 : hour;
+};
+
+const isWithinBusinessHours = (ip?: string): boolean => {
+  const hour = getClientHour(ip);
   return hour >= 12 && hour < 23;
 };
 
 export const orderService = {
-  async processNewOrder(payload: CreateOrderPayload): Promise<Pedido> {
-    if (!isWithinBusinessHours()) {
+  async processNewOrder(payload: CreateOrderPayload, ip?: string): Promise<Pedido> {
+    if (!isWithinBusinessHours(ip)) {
       throw new OrderBusinessHoursError();
     }
 
@@ -65,7 +82,11 @@ export const orderService = {
     return orderRepository.getOrderById(orderId);
   },
 
-  async updateOrderStatus(orderId: number, newStatus: string): Promise<Pedido | null> {
-    return orderRepository.updateOrderStatus(orderId, newStatus);
+  async updateOrderStatus(orderId: number, newStatus: string, motivoCancelacion?: string): Promise<Pedido | null> {
+    return orderRepository.updateOrderStatus(orderId, newStatus, motivoCancelacion);
+  },
+
+  async getActiveOrdersCount(): Promise<number> {
+    return orderRepository.getActiveOrdersCount();
   },
 };

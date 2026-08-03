@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { orderService, OrderBusinessHoursError } from '../services/order.service';
-import { CreateOrderPayload, OrderStatusLockedError } from '../types/order.types';
+import { CreateOrderPayload, OrderStatusLockedError, MissingCancelReasonError } from '../types/order.types';
 
 export const orderController = {
   async createOrder(req: Request, res: Response): Promise<void> {
@@ -13,7 +13,7 @@ export const orderController = {
         return;
       }
 
-      const newOrder = await orderService.processNewOrder(orderPayload);
+      const newOrder = await orderService.processNewOrder(orderPayload, req.ip);
       res.status(201).json(newOrder);
     } catch (error: unknown) {
       if (error instanceof OrderBusinessHoursError) {
@@ -55,17 +55,27 @@ export const orderController = {
     }
   },
 
+  async getActiveOrdersCount(req: Request, res: Response): Promise<void> {
+    try {
+      const count = await orderService.getActiveOrdersCount();
+      res.json({ count });
+    } catch (error: unknown) {
+      console.error('Error in orderController.getActiveOrdersCount:', error instanceof Error ? error.message : error);
+      res.status(500).json({ error: 'Error interno del servidor al obtener pedidos activos' });
+    }
+  },
+
   async updateOrderStatus(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { status } = req.body;
+      const { status, motivoCancelacion } = req.body;
 
       if (!status) {
         res.status(400).json({ error: 'Status is required' });
         return;
       }
 
-      const updatedOrder = await orderService.updateOrderStatus(parseInt(id, 10), status);
+      const updatedOrder = await orderService.updateOrderStatus(parseInt(id, 10), status, motivoCancelacion);
       if (updatedOrder) {
         res.json(updatedOrder);
       } else {
@@ -74,6 +84,10 @@ export const orderController = {
     } catch (error: unknown) {
       if (error instanceof OrderStatusLockedError) {
         res.status(409).json({ error: error.message });
+        return;
+      }
+      if (error instanceof MissingCancelReasonError) {
+        res.status(400).json({ error: error.message });
         return;
       }
       console.error('Error in orderController.updateOrderStatus:', error instanceof Error ? error.message : error);

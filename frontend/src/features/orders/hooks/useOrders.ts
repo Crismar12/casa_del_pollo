@@ -32,10 +32,10 @@ export const useOrders = (initialStatusFilter?: OrderStatus) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const updateStatus = async (orderId: string, newStatus: OrderStatus) => {
+  const updateStatus = async (orderId: string, newStatus: OrderStatus, motivoCancelacion?: string) => {
     try {
       setLoading(true);
-      await updateOrderStatus(orderId, newStatus);
+      await updateOrderStatus(orderId, newStatus, motivoCancelacion);
       
       await fetchOrders();
     } catch (err) {
