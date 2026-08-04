@@ -2,8 +2,8 @@ import { Product, CreateProductPayload, UpdateProductPayload } from '../types/pr
 import { productRepository } from '../repositories/product.repository';
 
 export const productService = {
-  async listAllProducts(categoryId?: string): Promise<Product[]> {
-    const products = await productRepository.getAll(categoryId);
+  async listAllProducts(categoryId?: string, includeInactive = false): Promise<Product[]> {
+    const products = await productRepository.getAll(categoryId, includeInactive);
     return products;
   },
 

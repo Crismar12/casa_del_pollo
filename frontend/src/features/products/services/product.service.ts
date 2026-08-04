@@ -13,10 +13,10 @@ interface BackendProduct {
   categoria_id?: number | null;
 }
 
-export const getProductos = async (categoryId?: string): Promise<BackendProduct[]> => {
+export const getProductos = async (categoryId?: string, includeInactive = false): Promise<BackendProduct[]> => {
   try {
     const data = await apiClient.get<BackendProduct[]>("/api/products", {
-      params: { categoryId },
+      params: { categoryId, includeInactive },
     });
     return data;
   } catch (error: unknown) {

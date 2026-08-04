@@ -2,15 +2,28 @@ import { db } from '../config/database';
 import { Product, CreateProductPayload, UpdateProductPayload } from '../types/product.types';
 
 export const productRepository = {
-  async getAll(categoryId?: string): Promise<Product[]> {
-    if (categoryId) {
-      const result = await db.query(
-        'SELECT *, "imgUrl" AS "imageUrl" FROM producto WHERE categoria_id = $1',
-        [categoryId]
-      );
-      return result.rows as Product[];
+  async getAll(categoryId?: string, includeInactive = false): Promise<Product[]> {
+    const conditions: string[] = [];
+    const params: (string | boolean)[] = [];
+    let paramIndex = 1;
+
+    if (!includeInactive) {
+      conditions.push(`activo = $${paramIndex++}`);
+      params.push(true);
     }
-    const result = await db.query('SELECT *, "imgUrl" AS "imageUrl" FROM producto');
+    if (categoryId) {
+      conditions.push(`categoria_id = $${paramIndex++}`);
+      params.push(categoryId);
+    }
+
+    const whereClause = conditions.length > 0
+      ? ` WHERE ${conditions.join(' AND ')}`
+      : '';
+
+    const result = await db.query(
+      `SELECT *, "imgUrl" AS "imageUrl" FROM producto${whereClause}`,
+      params
+    );
     return result.rows as Product[];
   },
 

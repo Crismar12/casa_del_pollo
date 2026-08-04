@@ -32,7 +32,7 @@ export const AdminProducts: React.FC = () => {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getProductos(selectedCategory || undefined);
+      const data = await getProductos(selectedCategory || undefined, true);
       setProducts(data);
       setError(null);
     } catch (err) {

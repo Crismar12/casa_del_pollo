@@ -10,7 +10,11 @@ interface Category {
   descripcion?: string;
 }
 
-export const AdminCategories: React.FC = () => {
+interface AdminCategoriesProps {
+  onCategoryChanged?: () => void;
+}
+
+export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChanged }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,11 +64,10 @@ export const AdminCategories: React.FC = () => {
     if (!categoryToDelete) return;
     
     try {
-      // Aquí iría la llamada al servicio para eliminar
-      // await deleteCategory(categoryToDelete.id);
       setCategories(categories.filter(c => c.id !== categoryToDelete.id));
       setIsDeleteModalOpen(false);
       setCategoryToDelete(null);
+      onCategoryChanged?.();
     } catch (err) {
       console.error('Error deleting category:', err);
       setError('Error al eliminar categoría');
@@ -75,6 +78,7 @@ export const AdminCategories: React.FC = () => {
     setIsModalOpen(false);
     setEditingCategory(null);
     fetchCategories();
+    onCategoryChanged?.();
   };
 
   return (

@@ -1,5 +1,6 @@
 import geoip from 'geoip-lite';
 import { orderRepository } from '../repositories/order.repository';
+import { productRepository } from '../repositories/product.repository';
 import { CreateOrderPayload, Pedido, DetallePedido } from '../types/order.types';
 
 interface OrderProduct {
@@ -13,6 +14,15 @@ export class OrderBusinessHoursError extends Error {
   constructor() {
     super('El restaurante está cerrado. Atendemos de 12:00 p.m. a 11:00 p.m.');
     this.name = 'OrderBusinessHoursError';
+  }
+}
+
+export class InactiveProductError extends Error {
+  constructor(productName?: string) {
+    super(productName
+      ? `El producto "${productName}" no está disponible actualmente.`
+      : 'Uno o más productos del pedido no están disponibles.');
+    this.name = 'InactiveProductError';
   }
 }
 
@@ -44,6 +54,16 @@ export const orderService = {
     }
 
     const { clientId, userId, nombrecliente, direccion, notas, items } = payload;
+
+    for (const item of items) {
+      const product = await productRepository.getById(String(item.productId));
+      if (!product) {
+        throw new InactiveProductError(`ID ${item.productId}`);
+      }
+      if (!product.activo) {
+        throw new InactiveProductError(product.nombre || undefined);
+      }
+    }
 
     
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);

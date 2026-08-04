@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getCategories } from "../services/category.service";
 import type { Category } from "../types/category.types";
 
@@ -7,22 +7,23 @@ export const useCategories = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        setError("Failed to fetch categories.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getCategories();
+      setCategories(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch categories.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { categories, loading, error };
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  return { categories, loading, error, refetch: fetchCategories };
 };

@@ -9,11 +9,16 @@ export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [categoriesRefreshKey, setCategoriesRefreshKey] = useState(0);
 
   const handleOrderUpdated = useCallback(() => {
     refetch();
     setRefreshKey(k => k + 1);
   }, [refetch]);
+
+  const handleCategoryChanged = useCallback(() => {
+    setCategoriesRefreshKey(k => k + 1);
+  }, []);
 
   if (loading) {
     return (
@@ -161,11 +166,11 @@ export const AdminPage = () => {
       )}
 
       {activeTab === 'productos' && (
-        <AdminProducts />
+        <AdminProducts key={categoriesRefreshKey} />
       )}
 
       {activeTab === 'categorias' && (
-        <AdminCategories />
+        <AdminCategories onCategoryChanged={handleCategoryChanged} />
       )}
 
       {activeTab === 'usuarios' && (

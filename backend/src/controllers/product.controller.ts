@@ -5,7 +5,8 @@ export const productController = {
   async getProducts(req: Request, res: Response): Promise<void> {
     try {
       const categoryId = req.query.categoryId as string | undefined;
-      const products = await productService.listAllProducts(categoryId);
+      const includeInactive = req.query.includeInactive === 'true';
+      const products = await productService.listAllProducts(categoryId, includeInactive);
       res.json(products);
     } catch (error: unknown) {
       console.error('Error en productController.getProducts:', error instanceof Error ? error.message : error);

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { orderService, OrderBusinessHoursError } from '../services/order.service';
+import { orderService, OrderBusinessHoursError, InactiveProductError } from '../services/order.service';
 import { CreateOrderPayload, OrderStatusLockedError, MissingCancelReasonError } from '../types/order.types';
 
 export const orderController = {
@@ -17,6 +17,10 @@ export const orderController = {
       res.status(201).json(newOrder);
     } catch (error: unknown) {
       if (error instanceof OrderBusinessHoursError) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      if (error instanceof InactiveProductError) {
         res.status(400).json({ error: error.message });
         return;
       }
