@@ -3,6 +3,13 @@ import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
 const SALE_ORDER_FILTER = "(estado = 'entregado' OR (estado = 'cancelado' AND contabilizar_venta))";
 
+const localDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
     const detalleResult = await db.query(
@@ -57,8 +64,8 @@ export const adminDashboardRepository = {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 6);
 
-    const todayISO = today.toISOString().split('T')[0];
-    const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
+    const todayISO = localDate(today);
+    const sevenDaysAgoISO = localDate(sevenDaysAgo);
 
     const result = await db.query(
       `SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER} ORDER BY fecha ASC`,
@@ -75,7 +82,7 @@ export const adminDashboardRepository = {
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dayString = date.toISOString().split('T')[0];
+      const dayString = localDate(date);
       const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
       dailyResult.push({
         day: dayName.charAt(0).toUpperCase() + dayName.slice(1).replace('.', ''),
@@ -87,7 +94,7 @@ export const adminDashboardRepository = {
   },
 
   async getSalesToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query(
       `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [today]
@@ -96,15 +103,15 @@ export const adminDashboardRepository = {
   },
 
   async getOrdersToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [today]);
     return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicket(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query(
-      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [today]
     );
     return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
@@ -127,7 +134,7 @@ export const adminDashboardRepository = {
   async getSalesYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query(
       `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
@@ -139,7 +146,7 @@ export const adminDashboardRepository = {
   async getOrdersYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [yesterdayISO]);
     return parseInt(result.rows[0].count, 10) || 0;
@@ -148,10 +155,10 @@ export const adminDashboardRepository = {
   async getAverageTicketYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query(
-      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [yesterdayISO]
     );
     return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
@@ -166,16 +173,18 @@ export const adminDashboardRepository = {
     ordersChange: number;
   }> {
     const today = new Date();
+    const dayOfWeek = today.getDay();
+    const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const thisMonday = new Date(today);
-    thisMonday.setDate(today.getDate() - today.getDay() + 1);
+    thisMonday.setDate(today.getDate() + offsetToMonday);
     const lastMonday = new Date(thisMonday);
     lastMonday.setDate(thisMonday.getDate() - 7);
     const lastSunday = new Date(thisMonday);
     lastSunday.setDate(thisMonday.getDate() - 1);
 
-    const thisWeekStart = thisMonday.toISOString().split('T')[0];
-    const lastWeekStart = lastMonday.toISOString().split('T')[0];
-    const lastWeekEnd = lastSunday.toISOString().split('T')[0];
+    const thisWeekStart = localDate(thisMonday);
+    const lastWeekStart = localDate(lastMonday);
+    const lastWeekEnd = localDate(lastSunday);
 
     const thisWeekResult = await db.query(
       `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND ${SALE_ORDER_FILTER}`,

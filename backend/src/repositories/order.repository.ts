@@ -1,6 +1,14 @@
 import { db } from '../config/database';
 import { Pedido, DetallePedido, OrderStatusLockedError, MissingCancelReasonError, getCancelReason } from '../types/order.types';
 
+function localDateStr(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 interface CreatePedidoPayload {
   idcliente: number;
   idusuario: number;
@@ -18,10 +26,14 @@ interface ProductDetailFromJoin {
 
 export const orderRepository = {
   async createOrder(orderData: CreatePedidoPayload): Promise<Pedido> {
+    const fecha = localDateStr();
+    const now = new Date();
     const result = await db.query(
-      `INSERT INTO pedido (idcliente, idusuario, nombrecliente, direccion, notas, estado, total)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      `INSERT INTO pedido (fecha, created_at, idcliente, idusuario, nombrecliente, direccion, notas, estado, total)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
+        fecha,
+        now,
         orderData.idcliente,
         orderData.idusuario,
         orderData.nombrecliente,

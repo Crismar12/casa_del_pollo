@@ -87,6 +87,13 @@ function weightedRandom<T>(items: readonly T[], weights: number[]): T {
   return items[items.length - 1];
 }
 
+function formatLocalDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 function randomDate(daysAgo: number): Date {
   const now = new Date();
   const offset = Math.random() * daysAgo;
@@ -305,18 +312,25 @@ export async function runSeed(client: PoolClient): Promise<void> {
       const usedIndices = new Set<number>();
       let total = 0;
 
+      let seedHour: number;
+      if (isToday) {
+        const maxH = Math.max(12, new Date().getHours() - 1);
+        seedHour = 12 + Math.floor(Math.random() * (maxH - 12 + 1));
+      } else {
+        seedHour = 12 + Math.floor(Math.random() * 11);
+      }
       const createdAt = new Date(
         fecha.getFullYear(),
         fecha.getMonth(),
         fecha.getDate(),
-        12 + Math.floor(Math.random() * 11),
+        seedHour,
         Math.floor(Math.random() * 60)
       );
 
       const orderRes = await client.query(
         `INSERT INTO pedido (fecha, created_at, estado, nombrecliente, direccion, notas, total, idcliente, idusuario, motivo_cancelacion, contabilizar_venta)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING idpedido`,
-        [fecha.toISOString().split('T')[0], createdAt, estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId, motivoCancelacion, contabilizarVenta]
+        [formatLocalDate(fecha), createdAt, estado, clienteName, faker.location.streetAddress(), '', 0, clienteId, vendId, motivoCancelacion, contabilizarVenta]
       );
       const pedidoId = orderRes.rows[0].idpedido;
 
@@ -338,7 +352,7 @@ export async function runSeed(client: PoolClient): Promise<void> {
       await client.query('UPDATE pedido SET total = $1 WHERE idpedido = $2', [total, pedidoId]);
 
       if (i < 5 || i === 49) {
-        const fechaStr = fecha.toISOString().split('T')[0];
+        const fechaStr = formatLocalDate(fecha);
         console.log(`   ✅ Pedido #${pedidoId} | ${fechaStr} | ${estado} | S/ ${total.toFixed(2)}`);
       }
     }

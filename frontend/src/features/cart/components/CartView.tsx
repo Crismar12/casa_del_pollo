@@ -40,17 +40,13 @@ export const CartView = () => {
 
     const handleClientConfirmed = async (clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }) => {
       try {
-        
-        const order = await createOrder(cartItems, clientInfo);
-        if (order) {
-          showNotification("Pedido confirmado con éxito!", "success");
-          dispatch(clearCart()); 
-        } else {
-          showNotification("Error al confirmar el pedido.", "error");
-        }
+        await createOrder(cartItems, clientInfo);
+        showNotification("Pedido confirmado con éxito!", "success");
+        dispatch(clearCart()); 
       } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Error al confirmar el pedido.";
         console.error("Error confirming order:", error);
-        showNotification("Error al confirmar el pedido.", "error");
+        showNotification(message, "error");
       }
     };
 

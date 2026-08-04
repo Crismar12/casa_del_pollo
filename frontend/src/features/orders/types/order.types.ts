@@ -22,6 +22,13 @@ export const CANCEL_REASONS = [
 
 export type CancelReasonValue = (typeof CANCEL_REASONS)[number]["value"];
 
+export function getCancelReasonLabel(value: string, contabilizarVenta?: boolean | null): string {
+  const reason = CANCEL_REASONS.find(r => r.value === value);
+  const label = reason?.label ?? value;
+  if (contabilizarVenta === undefined || contabilizarVenta === null) return label;
+  return contabilizarVenta ? `${label} (sin reembolso)` : `${label} (no contabilizado)`;
+}
+
 export interface Order {
   id: string;
   client: string;
@@ -32,4 +39,5 @@ export interface Order {
   paymentMethod: string;
   notas?: string;
   motivoCancelacion?: string | null;
+  contabilizarVenta?: boolean | null;
 }

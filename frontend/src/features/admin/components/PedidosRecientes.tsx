@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { Modal } from './Modal';
 import { useOrders } from '../../orders/hooks/useOrders';
-import { ORDER_STATUS, CANCEL_REASONS, type Order, type OrderStatus } from '../../orders/types/order.types';
+import { ORDER_STATUS, CANCEL_REASONS, getCancelReasonLabel, type Order, type OrderStatus } from '../../orders/types/order.types';
 import { getOrderDetails } from '../../orders/services/order.service';
 import { Button } from '../../../shared/components/iu';
 import { formatDateLocal, formatDateTimeLocal } from '../../../shared/utils/dateUtils';
@@ -10,6 +10,7 @@ import { exportOrderToPdf } from './ExportOrderPdf';
 
 type PedidosRecientesProps = {
   title?: string;
+  onOrderUpdated?: () => void;
 };
 
 const statusColors: Record<OrderStatus, string> = {
@@ -22,6 +23,7 @@ const statusColors: Record<OrderStatus, string> = {
 
 export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
   title = 'Pedidos Recientes',
+  onOrderUpdated,
 }) => {
   const { orders, loading, error, updateStatus, currentPage, totalPages, goToPage } = useOrders();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +55,16 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
   const handleStatusChange = async (newStatus: OrderStatus, motivoCancelacion?: string) => {
     if (selectedOrder) {
       await updateStatus(selectedOrder.id, newStatus, motivoCancelacion);
-      setSelectedOrder(prev => prev ? { ...prev, status: newStatus, motivoCancelacion } : null);
+      const reasonMeta = motivoCancelacion
+        ? CANCEL_REASONS.find(r => r.value === motivoCancelacion)
+        : null;
+      setSelectedOrder(prev => prev ? {
+        ...prev,
+        status: newStatus,
+        motivoCancelacion,
+        contabilizarVenta: reasonMeta?.contabilizaVenta ?? null,
+      } : null);
+      onOrderUpdated?.();
     }
   };
 
@@ -230,7 +241,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                     </p>
                     {selectedOrder.motivoCancelacion && (
                       <p className="text-xs text-red-600 mt-1">
-                        Motivo: {selectedOrder.motivoCancelacion}
+                        Motivo: {getCancelReasonLabel(selectedOrder.motivoCancelacion, selectedOrder.contabilizarVenta)}
                       </p>
                     )}
                   </div>
@@ -285,7 +296,10 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                             onChange={() => setCancelReason(reason.value)}
                             className="accent-red-600"
                           />
-                          {reason.label}
+                          {reason.label}{" "}
+                          <span className="text-xs opacity-70">
+                            ({reason.contabilizaVenta ? "sin reembolso" : "no contabilizado"})
+                          </span>
                         </label>
                       ))}
                     </div>

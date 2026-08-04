@@ -1,5 +1,5 @@
 import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories, DemoBanner } from '../features/admin/components';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
 import { RefreshCw, LayoutDashboard, Package, Tag, Users, Info } from 'lucide-react';
 
@@ -8,6 +8,12 @@ type TabType = 'dashboard' | 'productos' | 'categorias' | 'usuarios';
 export const AdminPage = () => {
   const { summary, loading, error, refetch } = useDashboardSummary();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleOrderUpdated = useCallback(() => {
+    refetch();
+    setRefreshKey(k => k + 1);
+  }, [refetch]);
 
   if (loading) {
     return (
@@ -69,7 +75,7 @@ export const AdminPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Panel de Administración</h1>
         <button
-          onClick={refetch}
+          onClick={handleOrderUpdated}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Actualizar datos del dashboard"
@@ -102,9 +108,8 @@ export const AdminPage = () => {
           <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg px-4 py-3">
             <Info className="w-5 h-5 mt-0.5 shrink-0" />
             <p className="text-sm">
-              Las ventas y los gráficos consideran los pedidos con estado <strong>"entregado"</strong> y las cancelaciones
-              marcadas como <strong>"cliente canceló tarde y ya estaba pagado"</strong>. El ticket promedio considera solo los
-              pedidos <strong>"entregado"</strong>.
+              Las ventas, el ticket promedio y los gráficos consideran los pedidos con estado <strong>"entregado"</strong>
+              y las cancelaciones sin reembolso.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,11 +151,11 @@ export const AdminPage = () => {
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PedidosRecientes />
-            <ProductosMasVendidos />
+            <PedidosRecientes onOrderUpdated={handleOrderUpdated} />
+            <ProductosMasVendidos key={refreshKey} />
           </div>
           <div className="w-full">
-            <ResumenSemanal />
+            <ResumenSemanal key={refreshKey} />
           </div>
         </div>
       )}

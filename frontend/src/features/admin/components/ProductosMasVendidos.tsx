@@ -49,7 +49,8 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-bold mb-4">{title}</h3>
+      <h3 className="text-lg font-bold mb-1">{title}</h3>
+      <p className="text-xs text-gray-400 mb-4">Histórico — de todos los pedidos</p>
       <div className="space-y-3">
         {products.map((product, index) => {
           const Icon = productIcons[product.category] || productIcons.Unknown;
