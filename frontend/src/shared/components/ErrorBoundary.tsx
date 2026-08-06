@@ -37,11 +37,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
             <div className="text-5xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Algo salió mal</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Algo salió mal</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Ocurrió un error inesperado. Por favor, intenta de nuevo.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
                 Ir al login
               </button>

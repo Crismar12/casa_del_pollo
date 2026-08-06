@@ -80,7 +80,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ children, classNam
       />
       
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:relative md:translate-x-0 md:shadow-none md:w-auto md:h-auto`}
       >

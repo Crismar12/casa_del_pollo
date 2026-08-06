@@ -10,7 +10,7 @@ export const OrderList: React.FC<OrderListProps> = ({ orders }) => {
   if (orders.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500">No se encontraron pedidos.</p>
+        <p className="text-gray-500 dark:text-gray-400">No se encontraron pedidos.</p>
       </div>
     );
   }

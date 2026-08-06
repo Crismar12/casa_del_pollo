@@ -14,11 +14,11 @@ type PedidosRecientesProps = {
 };
 
 const statusColors: Record<OrderStatus, string> = {
-  [ORDER_STATUS.PENDING]: 'bg-orange-100 text-orange-800',
-  [ORDER_STATUS.PREPARING]: 'bg-yellow-100 text-yellow-800',
-  [ORDER_STATUS.DELIVERING]: 'bg-blue-100 text-blue-800',
-  [ORDER_STATUS.DELIVERED]: 'bg-green-100 text-green-800',
-  [ORDER_STATUS.CANCELED]: 'bg-red-100 text-red-800',
+  [ORDER_STATUS.PENDING]: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300',
+  [ORDER_STATUS.PREPARING]: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+  [ORDER_STATUS.DELIVERING]: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+  [ORDER_STATUS.DELIVERED]: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+  [ORDER_STATUS.CANCELED]: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
 };
 
 export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
@@ -89,15 +89,15 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
     setCancelReason(null);
   };
 
-  if (loading) return <div className="bg-white rounded-lg shadow-md p-6">Cargando pedidos...</div>;
-  if (error) return <div className="bg-white rounded-lg shadow-md p-6 text-red-500">Error: {error}</div>;
+  if (loading) return <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">Cargando pedidos...</div>;
+  if (error) return <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
       <h3 className="text-lg font-bold mb-4">{title}</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-900">
             <tr>
               <th scope="col" className="px-6 py-3">ID Pedido</th>
               <th scope="col" className="px-6 py-3">Cliente</th>
@@ -109,8 +109,8 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id} className="bg-white border-b">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+              <tr key={order.id} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+                <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
                   {order.id}
                 </th>
                 <td className="px-6 py-4">{order.client}</td>
@@ -125,14 +125,15 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenModal(order)}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                      aria-label="Ver detalles del pedido"
                     >
                       <Eye className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => exportOrderToPdf(order)}
-                      className="text-gray-500 hover:text-red-600"
-                      title="Exportar PDF"
+                      className="text-gray-500 dark:text-gray-400 hover:text-red-600"
+                      aria-label="Exportar PDF"
                     >
                       <Download className="w-5 h-5" />
                     </button>
@@ -178,42 +179,42 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         {modalLoading ? (
           <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            <p className="ml-3 text-gray-600">Cargando detalles del pedido...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+            <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando detalles del pedido...</p>
           </div>
         ) : (
           selectedOrder && (
-            <div className="p-2 text-gray-800">
+            <div className="p-2 text-gray-800 dark:text-gray-100">
               <h4 className="text-xl font-bold mb-4 text-center">Detalles del Pedido</h4>
 
               <div className="flex flex-col gap-4 mb-4">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">ID</p>
-                  <p className="font-bold text-black">{selectedOrder.id}</p>
+                <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">ID</p>
+                  <p className="font-bold text-black dark:text-white">{selectedOrder.id}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-500">Cliente</p>
-                    <p className="font-bold text-black">{selectedOrder.client}</p>
+                  <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
+                    <p className="font-bold text-black dark:text-white">{selectedOrder.client}</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-500">Fecha</p>
-                    <p className="font-bold text-black">{formatDateTimeLocal(selectedOrder.createdAt)}</p>
+                  <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Fecha</p>
+                    <p className="font-bold text-black dark:text-white">{formatDateTimeLocal(selectedOrder.createdAt)}</p>
                   </div>
                 </div>
 
-                <div className="bg-red-100 bg-opacity-50 p-3 rounded-lg mb-4 text-center">
-                  <p className="text-sm text-red-800">Total</p>
-                  <p className="text-2xl font-bold text-red-800">S/ {Number(selectedOrder.total).toFixed(2)}</p>
+                <div className="bg-red-100 dark:bg-red-900/30 bg-opacity-50 p-3 rounded-lg mb-4 text-center">
+                  <p className="text-sm text-red-800 dark:text-red-300">Total</p>
+                  <p className="text-2xl font-bold text-red-800 dark:text-red-300">S/ {Number(selectedOrder.total).toFixed(2)}</p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-3 rounded-lg mb-4">
-                <p className="text-sm text-gray-500 mb-2">Productos</p>
+              <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg mb-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Productos</p>
                 <ul className="list-disc list-inside">
                   {selectedOrder.products.map((product, index) => (
-                    <li key={index} className="text-black">
+                    <li key={index} className="text-black dark:text-white">
                       <span className="font-bold">{product.name}</span> (x{product.quantity})
                     </li>
                   ))}
@@ -221,33 +222,33 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
               </div>
 
               {selectedOrder.notas && (
-                <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg mb-4">
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 p-3 rounded-lg mb-4">
                   <p className="text-sm text-amber-700 mb-1 font-medium">Notas del pedido</p>
-                  <p className="text-black">{selectedOrder.notas}</p>
+                  <p className="text-black dark:text-white">{selectedOrder.notas}</p>
                 </div>
               )}
 
               <div className="flex flex-col items-center mt-4">
                 {selectedOrder.status === ORDER_STATUS.DELIVERED ? (
-                  <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-center">
-                    <p className="text-sm font-semibold text-green-700">
+                  <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 rounded-lg px-4 py-3 text-center">
+                    <p className="text-sm font-semibold text-green-700 dark:text-green-300">
                       Pedido entregado — estado final, ya no se puede modificar.
                     </p>
                   </div>
                 ) : selectedOrder.status === ORDER_STATUS.CANCELED ? (
-                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center">
-                    <p className="text-sm font-semibold text-red-700">
+                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 rounded-lg px-4 py-3 text-center">
+                    <p className="text-sm font-semibold text-red-700 dark:text-red-300">
                       Pedido cancelado — estado final, ya no se puede modificar.
                     </p>
                     {selectedOrder.motivoCancelacion && (
-                      <p className="text-xs text-red-600 mt-1">
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                         Motivo: {getCancelReasonLabel(selectedOrder.motivoCancelacion, selectedOrder.contabilizarVenta)}
                       </p>
                     )}
                   </div>
                 ) : confirmStatus === ORDER_STATUS.DELIVERED ? (
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-center w-full">
-                    <p className="text-sm font-semibold text-amber-800 mb-1">
+                  <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 rounded-lg px-4 py-3 text-center w-full">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">
                       ¿Quieres marcar este pedido como entregado?
                     </p>
                     <p className="text-xs text-amber-700 mb-4">
@@ -271,11 +272,11 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                     </div>
                   </div>
                 ) : confirmStatus === ORDER_STATUS.CANCELED ? (
-                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center w-full">
-                    <p className="text-sm font-semibold text-red-800 mb-1">
+                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 rounded-lg px-4 py-3 text-center w-full">
+                    <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">
                       ¿Deseas cancelar este pedido?
                     </p>
-                    <p className="text-xs text-red-600 mb-4">
+                    <p className="text-xs text-red-600 dark:text-red-400 mb-4">
                       Esta acción es irreversible: una vez cancelado, no podrás volver a cambiar el estado del pedido. Selecciona el motivo de la cancelación.
                     </p>
                     <div className="flex flex-col gap-2 mb-4 text-left">
@@ -284,8 +285,8 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                           key={reason.value}
                           className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm cursor-pointer ${
                             cancelReason === reason.value
-                              ? 'border-red-500 bg-red-100 text-red-900'
-                              : 'border-gray-300 text-gray-700 hover:border-red-300'
+                              ? 'border-red-500 bg-red-100 dark:bg-red-900/30 text-red-900 dark:text-red-300'
+                              : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300'
                           }`}
                         >
                           <input
@@ -323,7 +324,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm text-gray-500 mb-2">Cambiar Estado:</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Cambiar Estado:</p>
                     <div className="flex flex-wrap justify-center gap-2">
                       {Object.values(ORDER_STATUS).map((status) => {
                         const isSelected = selectedOrder.status === status;

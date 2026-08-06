@@ -21,12 +21,12 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ onResetComplete }) => {
   };
 
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+    <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600" />
           <div>
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
               Modo Demo — Los datos se reinician con el botón
             </p>
             <p className="text-xs text-amber-600">
@@ -57,7 +57,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ onResetComplete }) => {
             <button
               onClick={() => setShowConfirm(false)}
               disabled={resetting}
-              className="px-3 py-1.5 text-sm font-medium text-amber-700 bg-white border border-amber-300 rounded-md hover:bg-amber-50 disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-amber-700 bg-white dark:bg-gray-800 border border-amber-300 rounded-md hover:bg-amber-50 dark:hover:bg-amber-900/30 disabled:opacity-50 transition-colors"
             >
               Cancelar
             </button>

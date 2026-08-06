@@ -5,8 +5,8 @@ import { useWeeklySalesSummary } from '../hooks/useWeeklySalesSummary';
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) => {
   if (!active || !payload || !payload.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3">
-      <p className="text-sm font-medium text-gray-600 mb-1">{label}</p>
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-4 py-3">
+      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{label}</p>
       <p className="text-lg font-bold text-red-600">S/ {Number(payload[0].value).toFixed(2)}</p>
     </div>
   );
@@ -17,16 +17,16 @@ export const ResumenSemanal: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-center h-80">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <p className="ml-3 text-gray-600">Cargando resumen semanal...</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 flex items-center justify-center h-80">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+        <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando resumen semanal...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 text-red-500 h-80 flex items-center justify-center">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 text-red-500 h-80 flex items-center justify-center">
         <p>Error: {error}</p>
       </div>
     );
@@ -34,8 +34,8 @@ export const ResumenSemanal: React.FC = () => {
 
   if (summary.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 h-80 flex items-center justify-center">
-        <p className="text-gray-500">No hay datos de ventas para esta semana.</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 h-80 flex items-center justify-center">
+        <p className="text-gray-500 dark:text-gray-400">No hay datos de ventas para esta semana.</p>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export const ResumenSemanal: React.FC = () => {
   const maxVal = Math.max(...summary.map(d => d.earnings), 1);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
       <h3 className="text-lg font-bold mb-4">Resumen Semanal de Ventas</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
@@ -74,6 +74,7 @@ export const ResumenSemanal: React.FC = () => {
               <Cell
                 key={`cell-${index}`}
                 fill={entry.earnings === maxVal ? '#dc2626' : '#fca5a5'}
+                style={{ animationDelay: `${index * 100}ms` }}
               />
             ))}
           </Bar>

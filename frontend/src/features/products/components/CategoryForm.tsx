@@ -72,8 +72,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ category, onCategory
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
         {isEditing ? 'Editar Categoría' : 'Agregar Categoría'}
       </h3>
 
@@ -88,7 +88,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ category, onCategory
         />
 
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700 mb-1">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Descripción
           </label>
           <textarea
@@ -96,16 +96,16 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ category, onCategory
             onChange={(e) => setDescripcion(e.target.value)}
             placeholder="Descripción de la categoría"
             rows={3}
-            className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
           />
         </div>
 
         {error && (
-          <p className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded">{error}</p>
+          <p className="text-red-600 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
         )}
 
         {success && (
-          <p className="text-green-600 text-sm bg-green-50 px-3 py-2 rounded">{success}</p>
+          <p className="text-green-600 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
         )}
 
         <div className="flex gap-2">
@@ -113,7 +113,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ category, onCategory
             type="submit"
             gradient={true}
             disabled={loading}
-            className="flex-1 py-2 rounded-lg font-bold shadow-md"
+            className="flex-1 py-2 rounded-lg font-bold shadow-md dark:shadow-gray-900/40"
           >
             {loading ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Crear Categoría'}
           </Button>

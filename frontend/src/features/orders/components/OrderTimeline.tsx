@@ -34,7 +34,7 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) =
 
   if (currentStatus === ORDER_STATUS.CANCELED) {
     return (
-      <div className="text-center px-4 py-2 bg-red-100 text-red-700 rounded-lg">
+      <div className="text-center px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg">
         Pedido Cancelado
       </div>
     );
@@ -49,12 +49,12 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) =
         const circleBgClass = isCompleted
           ? 'bg-green-500'
           : isCurrent
-            ? statusBackgroundColors[status]
-            : 'bg-gray-300';
+            ? `${statusBackgroundColors[status]} animate-pulse`
+            : 'bg-gray-300 dark:bg-gray-600';
 
         const textClass = isCurrent
           ? statusTextColors[status]
-          : 'text-gray-500';
+          : 'text-gray-500 dark:text-gray-400';
 
         return (
           <React.Fragment key={status}>
@@ -68,7 +68,7 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) =
               </p>            </div>
             {index < STATUS_SEQUENCE.length - 1 && (
               <div
-                className={`flex-1 h-1 mx-2 transition-colors duration-300 ${isCompleted ? 'bg-green-500' : 'bg-gray-300'
+                className={`flex-1 h-1 mx-2 transition-colors duration-300 ${isCompleted ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
               />
             )}

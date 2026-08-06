@@ -94,7 +94,7 @@ export const AdminProducts: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Productos</h2>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Productos</h2>
         <button
           onClick={() => {
             setEditingProduct(null);
@@ -109,19 +109,19 @@ export const AdminProducts: React.FC = () => {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
           <input
             type="text"
             placeholder="Buscar productos..."
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
           />
         </div>
         <select
           value={selectedCategory}
           onChange={handleCategoryFilter}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          className="px-4 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
           disabled={categoriesLoading}
         >
           <option value="">Todas las categorías</option>
@@ -136,7 +136,7 @@ export const AdminProducts: React.FC = () => {
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando productos...</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando productos...</p>
         </div>
       ) : error ? (
         <div className="text-center py-8 text-red-600">
@@ -149,14 +149,14 @@ export const AdminProducts: React.FC = () => {
           </button>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Package className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <p>No se encontraron productos</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="px-4 py-3">Imagen</th>
                 <th className="px-4 py-3">Nombre</th>
@@ -169,7 +169,7 @@ export const AdminProducts: React.FC = () => {
             </thead>
             <tbody>
               {filteredProducts.map(product => (
-                <tr key={product.id} className="bg-white border-b hover:bg-gray-50">
+                <tr key={product.id} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-4 py-3">
                     {product.imageUrl ? (
                       <img
@@ -178,19 +178,19 @@ export const AdminProducts: React.FC = () => {
                         className="w-10 h-10 rounded object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                         <Package className="w-5 h-5 text-gray-400" />
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{product.nombre}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{product.nombre}</td>
                   <td className="px-4 py-3">S/ {Number(product.precio).toFixed(2)}</td>
                   <td className="px-4 py-3">{product.stock}</td>
                   <td className="px-4 py-3">
                     {categories.find(c => c.id === product.categoria_id?.toString())?.nombre || '-'}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs ${product.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs ${product.activo ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
                       {product.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
@@ -247,14 +247,14 @@ export const AdminProducts: React.FC = () => {
       >
         <div className="text-center">
           <p className="mb-4">¿Deseas <strong>desactivar</strong> el producto "{productToDelete?.nombre}"?</p>
-          <p className="text-sm text-gray-500 mb-6">El producto dejará de aparecer en el menú, pero se conservará en los pedidos ya registrados.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">El producto dejará de aparecer en el menú, pero se conservará en los pedidos ya registrados.</p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => {
                 setIsDeleteModalOpen(false);
                 setProductToDelete(null);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>

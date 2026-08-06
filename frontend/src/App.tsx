@@ -59,7 +59,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 overflow-x-hidden">
       {/* Encabezado */}
       <AppHeader
         onMenuClick={toggleSidebar}
@@ -86,7 +86,7 @@ function App() {
 
         
                 <main
-                  className={`flex-1 p-6 bg-gray-50 transition-all duration-300 overflow-y-auto min-h-[calc(100vh-4rem)]`}          onClick={() => !isDesktop && isSidebarOpen && closeSidebar()}
+                  className={`flex-1 p-6 bg-gray-50 dark:bg-gray-950 transition-all duration-300 overflow-y-auto min-h-[calc(100vh-4rem)]`}          onClick={() => !isDesktop && isSidebarOpen && closeSidebar()}
         >
           <div className="max-w-7xl mx-auto">
             <Outlet />
@@ -107,7 +107,7 @@ function App() {
         title="Cerrar sesión"
       >
         <div className="text-center">
-          <p className="text-gray-700 mb-4">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
             Todavía hay <strong>{activeOrdersCount}</strong> pedido(s) sin atender. Si cierras sesión, no podrás
             seguirlos hasta volver a ingresar. ¿Deseas cerrar sesión de todas formas?
           </p>
