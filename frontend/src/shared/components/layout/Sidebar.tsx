@@ -19,7 +19,9 @@ export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; on
       className={`p-6 z-20 transition-all duration-300 ease-in-out bg-white flex flex-col justify-between h-[calc(100vh-4rem)] fixed top-16 left-0
         ${isDesktop ? "w-56" : "w-full"}
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
-      `}>
+      `}
+      onClick={() => { if (!isDesktop) onLinkClick(); }}
+    >
 
       <nav className="flex flex-col gap-2">
         {links.map((link) => (

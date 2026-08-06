@@ -54,6 +54,9 @@ export const apiClient = {
   async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', path, options, body);
   },
+  async delete<T = void>(path: string, options?: RequestOptions): Promise<T> {
+    return this.request<T>('DELETE', path, options);
+  },
   async upload<T>(path: string, formData: FormData, isRetry = false): Promise<T> {
     const url = this.buildUrl(path);
 

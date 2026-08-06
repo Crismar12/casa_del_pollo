@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { CategoryForm } from '../../products/components/CategoryForm';
-import { getCategories } from '../../products/services/category.service';
-import { Tag, Pencil, Trash2, Search, Plus } from 'lucide-react';
+import { getCategories, deleteCategory, updateCategory } from '../../products/services/category.service';
+import { Tag, Pencil, Search, Plus, Power, PowerOff } from 'lucide-react';
 
 interface Category {
   id: string;
   nombre: string;
   descripcion?: string;
+  activo: boolean;
 }
 
 interface AdminCategoriesProps {
@@ -22,12 +23,12 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [categoryToToggle, setCategoryToToggle] = useState<Category | null>(null);
 
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const data = await getCategories();
+      const data = await getCategories(true);
       setCategories(data);
       setError(null);
     } catch (err) {
@@ -55,22 +56,27 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
     setIsModalOpen(true);
   };
 
-  const handleDelete = (category: Category) => {
-    setCategoryToDelete(category);
+  const handleToggleActive = (category: Category) => {
+    setCategoryToToggle(category);
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = async () => {
-    if (!categoryToDelete) return;
+  const confirmToggleActive = async () => {
+    if (!categoryToToggle) return;
     
     try {
-      setCategories(categories.filter(c => c.id !== categoryToDelete.id));
-      setIsDeleteModalOpen(false);
-      setCategoryToDelete(null);
+      if (categoryToToggle.activo) {
+        await deleteCategory(categoryToToggle.id);
+      } else {
+        await updateCategory(categoryToToggle.id, { activo: true });
+      }
+      fetchCategories();
       onCategoryChanged?.();
+      setIsDeleteModalOpen(false);
+      setCategoryToToggle(null);
     } catch (err) {
-      console.error('Error deleting category:', err);
-      setError('Error al eliminar categoría');
+      console.error('Error toggling category:', err);
+      setError('Error al cambiar el estado de la categoría');
     }
   };
 
@@ -135,14 +141,20 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
               <tr>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3">Descripción</th>
+                <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filteredCategories.map(category => (
-                <tr key={category.id} className="bg-white border-b hover:bg-gray-50">
+                <tr key={category.id} className={`bg-white border-b hover:bg-gray-50 ${!category.activo ? 'opacity-60' : ''}`}>
                   <td className="px-4 py-3 font-medium text-gray-900">{category.nombre}</td>
                   <td className="px-4 py-3 text-gray-500">{category.descripcion || '-'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded-full text-xs ${category.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {category.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button
@@ -153,11 +165,11 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(category)}
-                        className="text-red-600 hover:text-red-800"
-                        title="Eliminar"
+                        onClick={() => handleToggleActive(category)}
+                        className={category.activo ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800'}
+                        title={category.activo ? 'Desactivar' : 'Activar'}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {category.activo ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
                       </button>
                     </div>
                   </td>
@@ -190,28 +202,38 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
-          setCategoryToDelete(null);
+          setCategoryToToggle(null);
         }}
-        title="Confirmar Eliminación"
+        title={categoryToToggle?.activo ? 'Desactivar Categoría' : 'Activar Categoría'}
       >
         <div className="text-center">
-          <p className="mb-4">¿Estás seguro de que deseas eliminar la categoría "{categoryToDelete?.nombre}"?</p>
-          <p className="text-sm text-gray-500 mb-6">Esta acción no se puede deshacer.</p>
+          <p className="mb-4">
+            {categoryToToggle?.activo
+              ? <>¿Deseas <strong>desactivar</strong> la categoría "{categoryToToggle?.nombre}"?</>
+              : <>¿Deseas <strong>reactivar</strong> la categoría "{categoryToToggle?.nombre}"?</>
+            }
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            {categoryToToggle?.activo
+              ? 'La categoría dejará de aparecer en el menú y en los filtros. Los productos que la usan no se verán afectados.'
+              : 'La categoría volverá a estar disponible en el menú y los filtros.'
+            }
+          </p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => {
                 setIsDeleteModalOpen(false);
-                setCategoryToDelete(null);
+                setCategoryToToggle(null);
               }}
               className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
             >
               Cancelar
             </button>
             <button
-              onClick={confirmDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              onClick={confirmToggleActive}
+              className={`px-4 py-2 text-white rounded-lg ${categoryToToggle?.activo ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
             >
-              Eliminar
+              {categoryToToggle?.activo ? 'Desactivar' : 'Reactivar'}
             </button>
           </div>
         </div>

@@ -4,7 +4,8 @@ import { categoryService } from '../services/category.service';
 export const categoryController = {
   async getCategories(req: Request, res: Response): Promise<void> {
     try {
-      const categories = await categoryService.listAllCategories();
+      const includeInactive = req.query.includeInactive === 'true';
+      const categories = await categoryService.listAllCategories(includeInactive);
       res.json(categories);
     } catch (error: unknown) {
       console.error('Error in categoryController.getCategories:', error instanceof Error ? error.message : error);
@@ -49,7 +50,7 @@ export const categoryController = {
   async updateCategory(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { nombre, descripcion } = req.body;
+      const { nombre, descripcion, activo } = req.body;
       if (nombre !== undefined && (typeof nombre !== 'string' || nombre.trim() === '')) {
         res.status(400).json({ error: 'El nombre no puede estar vacío' });
         return;
@@ -57,6 +58,7 @@ export const categoryController = {
       const category = await categoryService.updateCategory(id, {
         nombre: nombre?.trim(),
         descripcion,
+        activo,
       });
       if (!category) {
         res.status(404).json({ error: 'Categoría no encontrada' });

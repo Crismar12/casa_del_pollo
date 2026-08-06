@@ -20,7 +20,7 @@ function App() {
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)' });
   const { notification, hideNotification } = useNotificationContext();
   const navigate = useNavigate();
-  const { logout } = useAuth(); 
+  const { logout, usuario } = useAuth(); 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [activeOrdersCount, setActiveOrdersCount] = useState(0);
 
@@ -37,6 +37,11 @@ function App() {
 
   
   const handleLogout = async () => {
+    if (usuario?.rol !== 'admin') {
+      logout(); 
+      navigate('/login');
+      return;
+    }
     const activeCount = await getActiveOrdersCount();
     if (activeCount > 0) {
       setActiveOrdersCount(activeCount);
@@ -70,6 +75,14 @@ function App() {
           onLogoutClick={handleLogout}
           isDesktop={isDesktop}
         />
+
+        {/* Overlay — cierra el sidebar al hacer clic fuera */}
+        {!isDesktop && isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-10 bg-black/50"
+            onClick={closeSidebar}
+          />
+        )}
 
         
                 <main

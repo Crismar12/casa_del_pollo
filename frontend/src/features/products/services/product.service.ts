@@ -32,3 +32,7 @@ export const createProduct = async (payload: CreateProductPayload): Promise<Back
 export const updateProduct = async (id: string, payload: Partial<CreateProductPayload>): Promise<BackendProduct> => {
   return await apiClient.put<BackendProduct>(`/api/products/${id}`, payload);
 };
+
+export const deleteProduct = async (id: string): Promise<void> => {
+  await apiClient.delete(`/api/products/${id}`);
+};

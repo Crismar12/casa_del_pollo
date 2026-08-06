@@ -1,4 +1,4 @@
-import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, UserForm, AdminProducts, AdminCategories, DemoBanner } from '../features/admin/components';
+import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, AdminProducts, AdminCategories, AdminUsers, DemoBanner } from '../features/admin/components';
 import React, { useState, useCallback } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
 import { RefreshCw, LayoutDashboard, Package, Tag, Users, Info } from 'lucide-react';
@@ -174,9 +174,7 @@ export const AdminPage = () => {
       )}
 
       {activeTab === 'usuarios' && (
-        <div className="max-w-md">
-          <UserForm onUserCreated={() => {}} />
-        </div>
+        <AdminUsers />
       )}
     </div>
   );

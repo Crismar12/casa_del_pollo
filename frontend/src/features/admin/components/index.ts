@@ -6,4 +6,5 @@ export * from './ResumenSemanal';
 export * from './UserForm';
 export * from './AdminProducts';
 export * from './AdminCategories';
+export * from './AdminUsers';
 export * from './DemoBanner';

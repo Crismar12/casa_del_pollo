@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal } from './Modal';
 import { ProductForm } from '../../products/components/ProductForm';
-import { getProductos } from '../../products/services/product.service';
+import { getProductos, deleteProduct } from '../../products/services/product.service';
 import { useCategories } from '../../products/hooks/useCategories';
 import { Package, Pencil, Trash2, Search, Plus } from 'lucide-react';
 
@@ -73,14 +73,15 @@ export const AdminProducts: React.FC = () => {
     if (!productToDelete) return;
     
     try {
-      // Aquí iría la llamada al servicio para eliminar
-      // await deleteProduct(productToDelete.id);
-      setProducts(products.filter(p => p.id !== productToDelete.id));
+      await deleteProduct(productToDelete.id);
+      setProducts(prev => prev.map(p =>
+        p.id === productToDelete.id ? { ...p, activo: false } : p
+      ));
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
     } catch (err) {
       console.error('Error deleting product:', err);
-      setError('Error al eliminar producto');
+      setError('Error al desactivar producto');
     }
   };
 
@@ -205,7 +206,7 @@ export const AdminProducts: React.FC = () => {
                       <button
                         onClick={() => handleDelete(product)}
                         className="text-red-600 hover:text-red-800"
-                        title="Eliminar"
+                        title="Desactivar"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -242,11 +243,11 @@ export const AdminProducts: React.FC = () => {
           setIsDeleteModalOpen(false);
           setProductToDelete(null);
         }}
-        title="Confirmar Eliminación"
+        title="Desactivar Producto"
       >
         <div className="text-center">
-          <p className="mb-4">¿Estás seguro de que deseas eliminar el producto "{productToDelete?.nombre}"?</p>
-          <p className="text-sm text-gray-500 mb-6">Esta acción no se puede deshacer.</p>
+          <p className="mb-4">¿Deseas <strong>desactivar</strong> el producto "{productToDelete?.nombre}"?</p>
+          <p className="text-sm text-gray-500 mb-6">El producto dejará de aparecer en el menú, pero se conservará en los pedidos ya registrados.</p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => {
@@ -261,7 +262,7 @@ export const AdminProducts: React.FC = () => {
               onClick={confirmDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             >
-              Eliminar
+              Desactivar
             </button>
           </div>
         </div>

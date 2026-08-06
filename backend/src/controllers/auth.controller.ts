@@ -72,4 +72,81 @@ export const authController = {
       }
     }
   },
+
+  async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const search = req.query.search as string | undefined;
+      const includeInactive = req.query.includeInactive === 'true';
+      const users = await authService.listUsers(search, includeInactive);
+      res.json(users);
+    } catch (error: unknown) {
+      logger.error('Error in authController.getUsers:', error instanceof Error ? error.message : error);
+      res.status(500).json({ error: 'Internal server error fetching users' });
+    }
+  },
+
+  async getUserById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await authService.getUserById(id);
+      if (!user) {
+        res.status(404).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+      res.json(user);
+    } catch (error: unknown) {
+      logger.error('Error in authController.getUserById:', error instanceof Error ? error.message : error);
+      res.status(500).json({ error: 'Internal server error fetching user' });
+    }
+  },
+
+  async updateUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { nombre, email, rol, activo } = req.body;
+      const existing = await authService.getUserById(id);
+      if (!existing) {
+        res.status(404).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+
+      const currentUserId = (req as any).user?.id;
+      if (String(id) === String(currentUserId) && rol !== undefined && rol !== existing.rol) {
+        res.status(403).json({ error: 'No puedes cambiar tu propio rol' });
+        return;
+      }
+
+      const user = await authService.updateUser(id, { nombre, email, rol, activo });
+      res.json(user);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      if (message.includes('duplicate key')) {
+        res.status(409).json({ error: 'El email ya está en uso' });
+        return;
+      }
+      logger.error('Error in authController.updateUser:', message);
+      res.status(500).json({ error: 'Internal server error updating user' });
+    }
+  },
+
+  async deactivateUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const currentUserId = (req as any).user?.id;
+      const user = await authService.deactivateUser(id, currentUserId);
+      res.json(user);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      if (message === 'No puedes desactivar tu propia cuenta') {
+        res.status(403).json({ error: message });
+        return;
+      }
+      if (message.includes('not found')) {
+        res.status(404).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+      logger.error('Error in authController.deactivateUser:', message);
+      res.status(500).json({ error: 'Internal server error deactivating user' });
+    }
+  },
 };

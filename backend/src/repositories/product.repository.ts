@@ -102,7 +102,7 @@ export const productRepository = {
 
   async remove(id: string): Promise<Product | null> {
     const result = await db.query(
-      'DELETE FROM producto WHERE id = $1 RETURNING *, "imgUrl" AS "imageUrl"',
+      'UPDATE producto SET activo = false WHERE id = $1 RETURNING *, "imgUrl" AS "imageUrl"',
       [id]
     );
     if (result.rows.length === 0) return null;

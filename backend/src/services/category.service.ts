@@ -2,8 +2,8 @@ import { Category, CreateCategoryPayload, UpdateCategoryPayload } from '../types
 import { categoryRepository } from '../repositories/category.repository';
 
 export const categoryService = {
-  async listAllCategories(): Promise<Category[]> {
-    return await categoryRepository.getAll();
+  async listAllCategories(includeInactive = false): Promise<Category[]> {
+    return await categoryRepository.getAll(includeInactive);
   },
 
   async getCategoryDetails(id: string): Promise<Category | null> {
