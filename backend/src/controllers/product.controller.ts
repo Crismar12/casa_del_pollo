@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { productService } from '../services/product.service';
+import { logger } from '../utils/logger';
 
 export const productController = {
   async getProducts(req: Request, res: Response): Promise<void> {
@@ -9,7 +10,7 @@ export const productController = {
       const products = await productService.listAllProducts(categoryId, includeInactive);
       res.json(products);
     } catch (error: unknown) {
-      console.error('Error en productController.getProducts:', error instanceof Error ? error.message : error);
+      logger.error('Error en productController.getProducts:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al obtener productos' });
     }
   },
@@ -24,7 +25,7 @@ export const productController = {
       }
       res.json(product);
     } catch (error: unknown) {
-      console.error('Error en productController.getProductById:', error instanceof Error ? error.message : error);
+      logger.error('Error en productController.getProductById:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al obtener el producto' });
     }
   },
@@ -47,7 +48,7 @@ export const productController = {
       });
       res.status(201).json(product);
     } catch (error: unknown) {
-      console.error('Error en productController.createProduct:', error instanceof Error ? error.message : error);
+      logger.error('Error en productController.createProduct:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al crear el producto' });
     }
   },
@@ -62,7 +63,7 @@ export const productController = {
       }
       res.json(product);
     } catch (error: unknown) {
-      console.error('Error en productController.updateProduct:', error instanceof Error ? error.message : error);
+      logger.error('Error en productController.updateProduct:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al actualizar el producto' });
     }
   },
@@ -77,7 +78,7 @@ export const productController = {
       }
       res.json({ message: 'Producto eliminado correctamente' });
     } catch (error: unknown) {
-      console.error('Error en productController.deleteProduct:', error instanceof Error ? error.message : error);
+      logger.error('Error en productController.deleteProduct:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error interno del servidor al eliminar el producto' });
     }
   },

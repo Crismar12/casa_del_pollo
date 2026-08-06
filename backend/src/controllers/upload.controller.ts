@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import cloudinary from '../config/cloudinary';
+import { logger } from '../utils/logger';
 
 export const uploadController = {
   async uploadImage(req: Request, res: Response): Promise<void> {
@@ -28,7 +29,7 @@ export const uploadController = {
 
       res.json({ imageUrl: result.secure_url });
     } catch (error: unknown) {
-      console.error('Error en uploadController.uploadImage:', error instanceof Error ? error.message : error);
+      logger.error('Error en uploadController.uploadImage:', error instanceof Error ? error.message : error);
       res.status(500).json({ error: 'Error al subir la imagen' });
     }
   },

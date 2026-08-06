@@ -6,6 +6,12 @@ export const authController = {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, contrasena } = req.body;
+
+      if (!email || !contrasena || typeof email !== 'string' || typeof contrasena !== 'string') {
+        res.status(400).json({ error: 'Email y contraseña son requeridos' });
+        return;
+      }
+
       const result = await authService.verifyCredentials(email, contrasena);
 
       if (result) {

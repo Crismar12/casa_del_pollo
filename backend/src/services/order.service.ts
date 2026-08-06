@@ -55,6 +55,9 @@ export const orderService = {
 
     const { clientId, userId, nombrecliente, direccion, notas, items } = payload;
 
+    let total = 0;
+    const verifiedItems: Omit<DetallePedido, 'iddetalle'>[] = [];
+
     for (const item of items) {
       const product = await productRepository.getById(String(item.productId));
       if (!product) {
@@ -63,10 +66,16 @@ export const orderService = {
       if (!product.activo) {
         throw new InactiveProductError(product.nombre || undefined);
       }
+      const dbPrice = Number(product.precio);
+      const subtotal = dbPrice * item.quantity;
+      total += subtotal;
+      verifiedItems.push({
+        idpedido: 0,
+        idproducto: item.productId,
+        cantidad: item.quantity,
+        subtotal,
+      });
     }
-
-    
-    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     
     const newOrder = await orderRepository.createOrder({
@@ -79,16 +88,11 @@ export const orderService = {
       total,
     });
 
-    
-    const orderDetailsToCreate: Omit<DetallePedido, 'iddetalle'>[] = items.map(item => ({
-      idpedido: newOrder.idpedido,
-      idproducto: item.productId,
-      cantidad: item.quantity,
-      subtotal: item.price * item.quantity,
-    }));
+    for (const detail of verifiedItems) {
+      detail.idpedido = newOrder.idpedido;
+    }
 
-    
-    await orderRepository.createOrderDetails(orderDetailsToCreate);
+    await orderRepository.createOrderDetails(verifiedItems);
 
     return newOrder;
   },
