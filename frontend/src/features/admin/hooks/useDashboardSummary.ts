@@ -7,9 +7,9 @@ export const useDashboardSummary = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDashboardSummary = useCallback(async () => {
+  const fetchDashboardSummary = useCallback(async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await adminDashboardService.getDashboardSummary();
       setSummary(data);
       setError(null);
@@ -22,8 +22,10 @@ export const useDashboardSummary = () => {
   }, []);
 
   useEffect(() => {
-    fetchDashboardSummary();
+    fetchDashboardSummary(true);
   }, [fetchDashboardSummary]);
 
-  return { summary, loading, error, refetch: fetchDashboardSummary };
+  const refetch = useCallback(() => fetchDashboardSummary(false), [fetchDashboardSummary]);
+
+  return { summary, loading, error, refetch };
 };

@@ -47,11 +47,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-yellow-300 via-yellow-500 to-red-400">
-      <div className="bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-yellow-300">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-orange-400 via-red-500 to-orange-700">
+      <div className="bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-orange-300">
         <div className="mb-4">
-          <h1 className="text-3xl font-extrabold text-yellow-600 drop-shadow-sm">
-            🐔 La Casa del Pollo
+          <h1 className="text-3xl font-extrabold text-orange-600 drop-shadow-sm">
+            🐔 El Paraíso del Pollo
           </h1>
           <p className="text-gray-600 mt-1 text-sm font-medium">
             ¡Bienvenido! Ingresa para continuar
@@ -93,6 +93,16 @@ export default function Login() {
             {generalError}
           </p>
         )}
+
+        <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-left">
+          <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2">
+            Credenciales de demostración
+          </p>
+          <div className="space-y-1 text-sm text-gray-700">
+            <p><span className="font-semibold">Admin:</span> admin@demo.com / admin123</p>
+            <p><span className="font-semibold">Vendedor:</span> vendedor@demo.com / vend123</p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ export const apiClient = {
   async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
     return response.json();
@@ -48,8 +48,34 @@ export const apiClient = {
   async post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('POST', path, options, body);
   },
+  async put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+    return this.request<T>('PUT', path, options, body);
+  },
   async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', path, options, body);
+  },
+  async delete<T = void>(path: string, options?: RequestOptions): Promise<T> {
+    return this.request<T>('DELETE', path, options);
+  },
+  async upload<T>(path: string, formData: FormData, isRetry = false): Promise<T> {
+    const url = this.buildUrl(path);
+
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        ...this.getAuthHeaders(),
+      },
+      body: formData,
+    });
+
+    if (response.status === 401 && !isRetry && refreshAccessTokenFn) {
+      const newToken = await refreshAccessTokenFn();
+      if (newToken) {
+        return this.upload<T>(path, formData, true);
+      }
+    }
+
+    return this.handleResponse(response);
   },
   async request<T>(method: string, path: string, options?: RequestOptions, body?: unknown, isRetry = false): Promise<T> {
     const { params, ...fetchOptions } = options || {};

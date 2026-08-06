@@ -1,3 +1,5 @@
+process.env.TZ = 'America/Lima';
+
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -15,8 +17,11 @@ import authRoutes from './routes/auth.routes';
 import clientRoutes from './routes/client.routes';
 import orderRoutes from './routes/order.routes';
 import adminDashboardRoutes from './routes/adminDashboard.routes';
+import uploadRoutes from './routes/upload.routes';
 
 const app = express();
+
+app.set('trust proxy', 1);
 
 
 app.use(helmet());
@@ -31,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminDashboardRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');

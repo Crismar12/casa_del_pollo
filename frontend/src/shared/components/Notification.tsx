@@ -7,10 +7,11 @@ interface NotificationProps {
   show: boolean;
   message: string;
   type: 'success' | 'error' | 'info';
+  action?: { label: string; onClick: () => void };
   onClose: () => void;
 }
 
-export const Notification: React.FC<NotificationProps> = ({ show, message, type, onClose }) => {
+export const Notification: React.FC<NotificationProps> = ({ show, message, type, action, onClose }) => {
   const icon = {
     success: <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />,
     error: <XCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />,
@@ -51,6 +52,18 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
                 <div className="flex-shrink-0">{icon}</div>
                 <div className="ml-3 w-0 flex-1 pt-0.5">
                   <p className={`text-sm font-medium ${textColor}`}>{message}</p>
+                  {action && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        action.onClick();
+                        onClose();
+                      }}
+                      className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold bg-white text-green-700 border border-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      {action.label}
+                    </button>
+                  )}
                 </div>
                 <div className="ml-4 flex flex-shrink-0">
                   <button

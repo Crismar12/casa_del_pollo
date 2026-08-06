@@ -1,15 +1,14 @@
-
 import React from 'react';
 import { Drumstick, Soup, Coffee, PlusCircle } from 'lucide-react';
 import { useMostSoldProducts } from '../hooks/useMostSoldProducts';
 
-
 const productIcons: Record<string, React.ElementType> = {
-  'Pollo a la Brasa': Drumstick,
-  'Combos': Soup, 
+  'Pollo': Drumstick,
   'Bebidas': Coffee,
-  'Adicionales': PlusCircle,
-  'Unknown': PlusCircle, 
+  'Acompañamientos': Soup,
+  'Postres': PlusCircle,
+  'Promociones': Soup,
+  'Unknown': PlusCircle,
 };
 
 type ProductosMasVendidosProps = {
@@ -46,26 +45,42 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
     );
   }
 
+  const maxSales = Math.max(...products.map(p => p.revenue), 1);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-bold mb-4">{title}</h3>
-      <div className="space-y-4">
-        {products.map((product) => {
+      <h3 className="text-lg font-bold mb-1">{title}</h3>
+      <p className="text-xs text-gray-400 mb-4">Histórico — de todos los pedidos</p>
+      <div className="space-y-3">
+        {products.map((product, index) => {
           const Icon = productIcons[product.category] || productIcons.Unknown;
+          const barWidth = (product.revenue / maxSales) * 100;
           return (
-            <div key={product.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center">
-                {Icon && <Icon className="w-6 h-6 text-gray-600 mr-3" />}
-                <div>
-                  <p className="font-semibold text-gray-800">{product.name}</p>
-                  {product.percentage !== undefined && (
-                    <p className="text-sm text-gray-500">{product.percentage}% del total</p>
-                  )}
+            <div key={product.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
+                index === 0 ? 'bg-red-100 text-red-700' :
+                index === 1 ? 'bg-orange-100 text-orange-700' :
+                'bg-gray-200 text-gray-600'
+              }`}>
+                {index + 1}
+              </span>
+              <Icon className="w-5 h-5 text-gray-500 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="font-medium text-gray-800 truncate">{product.name}</p>
+                  <span className="text-sm font-semibold text-gray-700 ml-2">
+                    {product.salesAmount} uds · S/ {Number(product.revenue).toFixed(2)}
+                  </span>
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-gray-800">{product.salesAmount}</p>
-                <p className="text-sm text-gray-500">ventas</p>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div
+                    className="bg-red-500 rounded-full h-1.5 transition-all duration-500"
+                    style={{ width: `${barWidth}%` }}
+                  />
+                </div>
+                {product.percentage !== undefined && (
+                  <p className="text-xs text-gray-500 mt-0.5">{product.percentage}% del total</p>
+                )}
               </div>
             </div>
           );

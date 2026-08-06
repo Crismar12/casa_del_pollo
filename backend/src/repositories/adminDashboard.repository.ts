@@ -1,26 +1,34 @@
 import { db } from '../config/database';
 import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
 
+const SALE_ORDER_FILTER = "(estado = 'entregado' OR (estado = 'cancelado' AND contabilizar_venta))";
+
+const localDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
     const detalleResult = await db.query(
-      'SELECT idproducto, cantidad FROM detallepedido'
+      `SELECT dp.idproducto,
+              SUM(dp.cantidad) AS sales_amount,
+              SUM(dp.subtotal) AS revenue
+       FROM detallepedido dp
+       JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
+       GROUP BY dp.idproducto
+       ORDER BY revenue DESC
+       LIMIT $1`,
+      [limit]
     );
 
-    const aggregatedSales: { [key: number]: number } = {};
-    detalleResult.rows.forEach((item: { idproducto: number; cantidad: number }) => {
-      aggregatedSales[item.idproducto] = (aggregatedSales[item.idproducto] || 0) + item.cantidad;
-    });
-
-    const sortedProductSales = Object.entries(aggregatedSales)
-      .sort(([, countA], [, countB]) => (countB as number) - (countA as number))
-      .slice(0, limit);
-
-    const topProductIds = sortedProductSales.map(([id]) => parseInt(id));
-
-    if (topProductIds.length === 0) {
+    if (detalleResult.rows.length === 0) {
       return [];
     }
+
+    const topProductIds = detalleResult.rows.map((row: { idproducto: string }) => Number(row.idproducto));
 
     const productsResult = await db.query(
       `SELECT p.idproducto, p.nombre, p.categoria_id, c.nombre AS categoria_nombre
@@ -30,20 +38,25 @@ export const adminDashboardRepository = {
       [topProductIds]
     );
 
-    const totalSalesAmount = Object.values(aggregatedSales).reduce((sum, count) => sum + (count as number), 0);
+    const totalRevenue = detalleResult.rows.reduce(
+      (sum: number, row: { revenue: string }) => sum + Number(row.revenue),
+      0
+    );
 
-    const result: MostSoldProduct[] = sortedProductSales.map(([id, salesAmount]) => {
-      const product = productsResult.rows.find((p: { idproducto: number }) => p.idproducto === parseInt(id));
+    return detalleResult.rows.map((row: { idproducto: string; sales_amount: string; revenue: string }) => {
+      const product = productsResult.rows.find(
+        (p: { idproducto: string }) => Number(p.idproducto) === Number(row.idproducto)
+      );
+      const revenue = Number(row.revenue);
       return {
         id: product?.idproducto.toString() || '',
-        name: product?.nombre || 'Unknown',
-        category: product?.categoria_nombre || 'Unknown',
-        salesAmount: salesAmount as number,
-        percentage: totalSalesAmount > 0 ? parseFloat(((salesAmount as number / totalSalesAmount) * 100).toFixed(2)) : 0,
+        name: product?.nombre || 'Desconocido',
+        category: product?.categoria_nombre || 'Sin categoría',
+        salesAmount: Number(row.sales_amount),
+        revenue,
+        percentage: totalRevenue > 0 ? parseFloat(((revenue / totalRevenue) * 100).toFixed(2)) : 0,
       };
     });
-
-    return result;
   },
 
   async getWeeklySalesSummary(): Promise<DailySalesData[]> {
@@ -51,25 +64,25 @@ export const adminDashboardRepository = {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 6);
 
-    const todayISO = today.toISOString().split('T')[0];
-    const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
+    const todayISO = localDate(today);
+    const sevenDaysAgoISO = localDate(sevenDaysAgo);
 
     const result = await db.query(
-      'SELECT fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 ORDER BY fecha ASC',
+      `SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER} ORDER BY fecha ASC`,
       [sevenDaysAgoISO, todayISO]
     );
 
     const dailySalesMap: { [key: string]: number } = {};
-    result.rows.forEach((pedido: { fecha: string; total: number }) => {
+    result.rows.forEach((pedido: { fecha: string; total: string }) => {
       const day = pedido.fecha;
-      dailySalesMap[day] = (dailySalesMap[day] || 0) + pedido.total;
+      dailySalesMap[day] = (dailySalesMap[day] || 0) + Number(pedido.total);
     });
 
     const dailyResult: DailySalesData[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dayString = date.toISOString().split('T')[0];
+      const dayString = localDate(date);
       const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
       dailyResult.push({
         day: dayName.charAt(0).toUpperCase() + dayName.slice(1).replace('.', ''),
@@ -81,24 +94,24 @@ export const adminDashboardRepository = {
   },
 
   async getSalesToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [today]
     );
     return parseFloat(result.rows[0].total) || 0;
   },
 
   async getOrdersToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [today]);
     return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicket(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDate(new Date());
     const result = await db.query(
-      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [today]
     );
     return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
@@ -121,10 +134,10 @@ export const adminDashboardRepository = {
   async getSalesYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query(
-      "SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [yesterdayISO]
     );
     return parseFloat(result.rows[0].total) || 0;
@@ -133,7 +146,7 @@ export const adminDashboardRepository = {
   async getOrdersYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [yesterdayISO]);
     return parseInt(result.rows[0].count, 10) || 0;
@@ -142,12 +155,81 @@ export const adminDashboardRepository = {
   async getAverageTicketYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
     const result = await db.query(
-      "SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND estado = 'entregado'",
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
       [yesterdayISO]
     );
     return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
+  },
+
+  async getWeeklyComparison(): Promise<{
+    thisWeekSales: number;
+    lastWeekSales: number;
+    thisWeekOrders: number;
+    lastWeekOrders: number;
+    salesChange: number;
+    ordersChange: number;
+  }> {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const thisMonday = new Date(today);
+    thisMonday.setDate(today.getDate() + offsetToMonday);
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setDate(thisMonday.getDate() - 7);
+    const lastSunday = new Date(thisMonday);
+    lastSunday.setDate(thisMonday.getDate() - 1);
+
+    const thisWeekStart = localDate(thisMonday);
+    const lastWeekStart = localDate(lastMonday);
+    const lastWeekEnd = localDate(lastSunday);
+
+    const thisWeekResult = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND ${SALE_ORDER_FILTER}`,
+      [thisWeekStart]
+    );
+    const lastWeekResult = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER}`,
+      [lastWeekStart, lastWeekEnd]
+    );
+
+    const thisWeekSales = parseFloat(thisWeekResult.rows[0].sales) || 0;
+    const lastWeekSales = parseFloat(lastWeekResult.rows[0].sales) || 0;
+    const thisWeekOrders = parseInt(thisWeekResult.rows[0].orders, 10) || 0;
+    const lastWeekOrders = parseInt(lastWeekResult.rows[0].orders, 10) || 0;
+
+    const salesChange = lastWeekSales > 0
+      ? parseFloat(((thisWeekSales - lastWeekSales) / lastWeekSales * 100).toFixed(1))
+      : thisWeekSales > 0 ? 100 : 0;
+    const ordersChange = lastWeekOrders > 0
+      ? parseFloat(((thisWeekOrders - lastWeekOrders) / lastWeekOrders * 100).toFixed(1))
+      : thisWeekOrders > 0 ? 100 : 0;
+
+    return { thisWeekSales, lastWeekSales, thisWeekOrders, lastWeekOrders, salesChange, ordersChange };
+  },
+
+  async getTopCategory(): Promise<{ name: string; totalSales: number; orderCount: number }> {
+    const result = await db.query(
+      `SELECT c.nombre, COALESCE(SUM(dp.subtotal), 0) AS total_sales, COUNT(DISTINCT p.idpedido) AS order_count
+       FROM categorias c
+       LEFT JOIN producto pr ON pr.categoria_id = c.idcategoria
+       LEFT JOIN detallepedido dp ON dp.idproducto = pr.idproducto
+       LEFT JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
+       GROUP BY c.idcategoria, c.nombre
+       ORDER BY total_sales DESC
+       LIMIT 1`
+    );
+
+    if (result.rows.length === 0) {
+      return { name: 'N/A', totalSales: 0, orderCount: 0 };
+    }
+
+    return {
+      name: result.rows[0].nombre,
+      totalSales: parseFloat(result.rows[0].total_sales) || 0,
+      orderCount: parseInt(result.rows[0].order_count, 10) || 0,
+    };
   },
 };

@@ -10,7 +10,7 @@ type TarjetaDashboardProps = {
 
 const colorClasses = {
   white: 'bg-white text-gray-800',
-  gradient: 'bg-gradient-to-r from-red-500 to-orange-500 text-white',
+  gradient: 'bg-gradient-to-r from-orange-500 to-red-600 text-white',
 };
 
 export const TarjetaDashboard: React.FC<TarjetaDashboardProps> = ({

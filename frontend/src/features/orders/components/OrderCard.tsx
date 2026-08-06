@@ -41,7 +41,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order: initialOrder }) => 
             <OrderTimeline currentStatus={orderToDisplay.status} />
           </div>
           <div className="md:col-span-1 text-right">
-            <p className="font-bold text-xl text-red-600">S/. {orderToDisplay.total.toFixed(2)}</p>
+            <p className="font-bold text-xl text-red-600">S/. {Number(orderToDisplay.total).toFixed(2)}</p>
             <button
               onClick={handleToggleExpand}
               className="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center ml-auto">

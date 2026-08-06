@@ -1,5 +1,13 @@
 import { db } from '../config/database';
-import { Pedido, DetallePedido } from '../types/order.types';
+import { Pedido, DetallePedido, OrderStatusLockedError, MissingCancelReasonError, getCancelReason } from '../types/order.types';
+
+function localDateStr(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 interface CreatePedidoPayload {
   idcliente: number;
@@ -18,10 +26,14 @@ interface ProductDetailFromJoin {
 
 export const orderRepository = {
   async createOrder(orderData: CreatePedidoPayload): Promise<Pedido> {
+    const fecha = localDateStr();
+    const now = new Date();
     const result = await db.query(
-      `INSERT INTO pedido (idcliente, idusuario, nombrecliente, direccion, notas, estado, total)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      `INSERT INTO pedido (fecha, created_at, idcliente, idusuario, nombrecliente, direccion, notas, estado, total)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
+        fecha,
+        now,
         orderData.idcliente,
         orderData.idusuario,
         orderData.nombrecliente,
@@ -74,7 +86,7 @@ export const orderRepository = {
     const countResult = await db.query(countQuery, countParams);
     const totalCount = parseInt(countResult.rows[0].count, 10);
 
-    dataQuery += ' ORDER BY fecha DESC, idpedido DESC';
+    dataQuery += ' ORDER BY created_at DESC, idpedido DESC';
     dataQuery += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
     params.push(limit, offset);
 
@@ -122,12 +134,42 @@ export const orderRepository = {
     return { ...orderResult.rows[0], products };
   },
 
-  async updateOrderStatus(orderId: number, newStatus: string): Promise<Pedido | null> {
+  async updateOrderStatus(orderId: number, newStatus: string, motivoCancelacion?: string): Promise<Pedido | null> {
+    const current = await db.query('SELECT estado FROM pedido WHERE idpedido = $1', [orderId]);
+    if (current.rows.length === 0) return null;
+
+    const currentEstado = current.rows[0].estado as string;
+    if (currentEstado === 'entregado' || currentEstado === 'cancelado') {
+      throw new OrderStatusLockedError();
+    }
+
+    if (newStatus === 'cancelado') {
+      const reason = getCancelReason(motivoCancelacion || '');
+      if (!reason) {
+        throw new MissingCancelReasonError();
+      }
+
+      const result = await db.query(
+        `UPDATE pedido SET estado = 'cancelado', motivo_cancelacion = $1, contabilizar_venta = $2
+         WHERE idpedido = $3 RETURNING *`,
+        [reason.motivo, reason.contabilizaVenta, orderId]
+      );
+      if (result.rows.length === 0) return null;
+      return result.rows[0] as Pedido;
+    }
+
     const result = await db.query(
       'UPDATE pedido SET estado = $1 WHERE idpedido = $2 RETURNING *',
       [newStatus, orderId]
     );
     if (result.rows.length === 0) return null;
     return result.rows[0] as Pedido;
+  },
+
+  async getActiveOrdersCount(): Promise<number> {
+    const result = await db.query(
+      "SELECT COUNT(*) FROM pedido WHERE estado NOT IN ('entregado', 'cancelado')"
+    );
+    return parseInt(result.rows[0].count, 10) || 0;
   },
 };

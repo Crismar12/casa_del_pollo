@@ -1,29 +1,32 @@
+const hasTimeComponent = (dateString: string): boolean => dateString.includes('T');
+
+const localeOptions: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+};
+
 export const formatDateLocal = (dateString: string): string => {
-  const [year, month, day] = dateString.split('T')[0].split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-  return date.toLocaleDateString('es-PE', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  });
+  const date = hasTimeComponent(dateString)
+    ? new Date(dateString)
+    : (() => {
+        const [year, month, day] = dateString.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      })();
+  return date.toLocaleDateString('es-PE', localeOptions);
 };
 
 export const formatDateTimeLocal = (dateString: string): string => {
-  const [year, month, day] = dateString.split('T')[0].split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-  
-  if (dateString.includes('T')) {
-    const timePart = dateString.split('T')[1];
-    const [hours, minutes] = timePart.split(':');
-    date.setHours(parseInt(hours), parseInt(minutes));
-  }
-  
+  const date = hasTimeComponent(dateString)
+    ? new Date(dateString)
+    : (() => {
+        const [year, month, day] = dateString.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      })();
   return date.toLocaleString('es-PE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    ...localeOptions,
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   });
 };

@@ -23,14 +23,18 @@ interface BackendOrder {
   nombrecliente: string;
   total: number;
   fecha: string;
+  created_at: string;
   estado: OrderStatus;
+  motivo_cancelacion?: string | null;
+  contabilizar_venta?: boolean | null;
 }
 
 interface BackendOrderDetails extends BackendOrder {
   products: BackendProduct[];
+  notas?: string;
 }
 
-export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order | null> => {
+export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order> => {
   try {
     const payload: CreateOrderFrontendPayload = {
       clientId: clientInfo.clientId,
@@ -48,8 +52,10 @@ export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId:
     const data = await apiClient.post<Order>("/api/orders", payload);
     return data;
   } catch (error: unknown) {
-    console.error('❌ Error al crear pedido:', error instanceof Error ? error.message : error);
-    return null;
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    const message = err.response?.data?.error || err.message || 'Error desconocido al crear el pedido.';
+    console.error('❌ Error al crear pedido:', message);
+    throw new Error(message);
   }
 };
 
@@ -63,11 +69,13 @@ export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit
     const mappedOrders: Order[] = response.orders.map(bOrder => ({
       id: bOrder.idpedido.toString(),
       client: bOrder.nombrecliente,
-      total: bOrder.total,
-      createdAt: bOrder.fecha,
+      total: Number(bOrder.total),
+      createdAt: bOrder.created_at,
       status: bOrder.estado,
       products: [], 
       paymentMethod: "Efectivo",
+      motivoCancelacion: bOrder.motivo_cancelacion ?? null,
+      contabilizarVenta: bOrder.contabilizar_venta ?? null,
     }));
 
     return { orders: mappedOrders, totalCount: response.totalCount };
@@ -85,15 +93,18 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
     const mappedOrder: Order = {
       id: orderDetails.idpedido.toString(),
       client: orderDetails.nombrecliente,
-      total: orderDetails.total,
-      createdAt: orderDetails.fecha,
+      total: Number(orderDetails.total),
+      createdAt: orderDetails.created_at,
       status: orderDetails.estado,
+      notas: orderDetails.notas,
+      motivoCancelacion: orderDetails.motivo_cancelacion ?? null,
+      contabilizarVenta: orderDetails.contabilizar_venta ?? null,
       products: orderDetails.products.map((p: BackendProduct) => ({
         id: p.idproducto.toString(),
         name: p.name,
         description: '',
         quantity: p.quantity,
-        price: p.price,
+        price: Number(p.price),
         stock: 0,
       })),
       paymentMethod: "Efectivo",
@@ -106,13 +117,23 @@ export const getOrderDetails = async (orderId: string): Promise<Order | null> =>
   }
 };
 
-export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus): Promise<Order | null> => {
+export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus, motivoCancelacion?: string): Promise<Order> => {
   try {
-    const updatedOrder = await apiClient.patch<Order>(`/api/orders/${orderId}/status`, { status: newStatus });
+    const updatedOrder = await apiClient.patch<Order>(`/api/orders/${orderId}/status`, { status: newStatus, motivoCancelacion });
     return updatedOrder;
   } catch (error: unknown) {
     console.error(`❌ Error al actualizar el estado del pedido ${orderId}:`, error instanceof Error ? error.message : error);
-    return null;
+    throw error;
+  }
+};
+
+export const getActiveOrdersCount = async (): Promise<number> => {
+  try {
+    const data = await apiClient.get<{ count: number }>("/api/orders/active-count");
+    return Number(data.count);
+  } catch (error: unknown) {
+    console.error('❌ Error al obtener pedidos activos:', error instanceof Error ? error.message : error);
+    return 0;
   }
 };
 

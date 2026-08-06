@@ -3,6 +3,7 @@ export interface Usuario {
   nombre: string;
   email: string;
   rol: string;
+  activo: boolean;
 }
 
 export interface AuthResponse {

@@ -19,7 +19,7 @@ export const CartView = () => {
 
     const handleUpdateQuantity = (product: Product, delta: number) => {
         if (delta > 0) {
-            addProduct(product);
+            addProduct(product, { showCartAction: false, duration: 2500 });
         } else {
             removeProduct(product.id);
         }
@@ -40,17 +40,13 @@ export const CartView = () => {
 
     const handleClientConfirmed = async (clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }) => {
       try {
-        
-        const order = await createOrder(cartItems, clientInfo);
-        if (order) {
-          showNotification("Pedido confirmado con éxito!", "success");
-          dispatch(clearCart()); 
-        } else {
-          showNotification("Error al confirmar el pedido.", "error");
-        }
+        await createOrder(cartItems, clientInfo);
+        showNotification("Pedido confirmado con éxito!", "success");
+        dispatch(clearCart()); 
       } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Error al confirmar el pedido.";
         console.error("Error confirming order:", error);
-        showNotification("Error al confirmar el pedido.", "error");
+        showNotification(message, "error");
       }
     };
 
@@ -61,7 +57,7 @@ export const CartView = () => {
 
     return (
         <div className="flex-1 p-6 overflow-y-auto">
-            <div className="max-w-7x1 mx-autookat">
+            <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <div className="w-6 lg:hidden" />
                 </div>
@@ -73,7 +69,7 @@ export const CartView = () => {
                                 <p className="text-gray-500 text-lg">Tu carrito está vacío</p>
                                 <button
                                     onClick={() => navigate("/producto")}
-                                    className="mt-6 w-full bg-linear-to-r from-red-500 to-orange-500 text-white px-8 py-3 rounded-lg"
+                                    className="mt-6 w-full bg-linear-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg"
                                 >
                                     Ver Menú
                                 </button>
@@ -82,7 +78,7 @@ export const CartView = () => {
                             cartItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="bg-white rounded-xl shadow-lg p-6 flex items-center space-x-4 lg:space-x-10"
+                                    className="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-wrap items-center gap-4 lg:gap-6"
                                 >
                                     <div className="bg-linear-to-br from-red-100 to-orange-100 w-20 h-20 rounded-lg flex items-center justify-center text-4xl">
                                         <img
@@ -97,7 +93,7 @@ export const CartView = () => {
                                             {item.description}
                                         </p>
                                         <p className="text-red-600 font-bold">
-                                            S/ {item.price.toFixed(2)}
+                                            S/ {Number(item.price).toFixed(2)}
                                         </p>
                                     </div>
                                     <div className="flex items-center space-x-3">
@@ -141,7 +137,7 @@ export const CartView = () => {
                                                 {item.name} x{item.quantity}
                                             </span>
                                             <span>
-                                                S/ {(item.price * item.quantity).toFixed(2)}
+                                                S/ {(Number(item.price) * item.quantity).toFixed(2)}
                                             </span>
                                         </div>
                                     ))}
@@ -150,13 +146,13 @@ export const CartView = () => {
                                     <div className="flex justify-between text-xl font-bold">
                                         <span>Total:</span>
                                         <span className="text-red-600">
-                                            S/ {cartTotal.toFixed(2)}
+                                            S/ {Number(cartTotal).toFixed(2)}
                                         </span>
                                     </div>
                                 </div>
                                 <button
                                     onClick={handleConfirmOrderClick}
-                                    className="w-full bg-linear-to-r from-red-500 to-orange-500 text-white py-4 rounded-lg font-bold"
+                                    className="w-full bg-linear-to-r from-orange-500 to-red-600 text-white py-4 rounded-lg font-bold"
                                 >
                                     Confirmar Pedido
                                 </button>

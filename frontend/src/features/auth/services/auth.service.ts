@@ -28,4 +28,18 @@ export const authService = {
     const response = await apiClient.post<{ message: string; user: Usuario }>('/api/auth/register', data);
     return response;
   },
+
+  getUsers: async (search?: string, includeInactive = true): Promise<Usuario[]> => {
+    return await apiClient.get<Usuario[]>('/api/auth/users', {
+      params: { search, includeInactive },
+    });
+  },
+
+  updateUser: async (id: string, data: { nombre?: string; email?: string; rol?: string; activo?: boolean }): Promise<Usuario> => {
+    return await apiClient.put<Usuario>(`/api/auth/users/${id}`, data);
+  },
+
+  deactivateUser: async (id: string): Promise<Usuario> => {
+    return await apiClient.patch<Usuario>(`/api/auth/users/${id}/deactivate`, {});
+  },
 };

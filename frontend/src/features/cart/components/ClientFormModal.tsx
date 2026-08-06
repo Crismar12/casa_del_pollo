@@ -88,66 +88,64 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({ isOpen, onClos
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Información del Cliente">
-      <div className="p-4">
-        <div className="mb-4">
-          <Input
-            label="Nombre Completo"
-            name="nombre"
-            value={clientDetails.nombre}
-            onChange={handleChange}
-            placeholder="Ej: Juan Pérez"
-            required
-            error={nombreError}
-          />
-        </div>
-        <div className="mb-4">
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            value={clientDetails.email}
-            onChange={handleChange}
-            placeholder="Ej: juan.perez@example.com"
-            required
-            error={emailError}
-          />
-        </div>
-        <div className="mb-4">
-          <Input
-            label="Teléfono"
-            name="telefono"
-            value={clientDetails.telefono}
-            onChange={handleChange}
-            placeholder="Ej: 987654321"
-          />
-        </div>
-        <div className="mb-4">
-          <Input
-            label="Dirección"
-            name="direccion"
-            value={clientDetails.direccion}
-            onChange={handleChange}
-            placeholder="Ej: Av. Los Girasoles 123"
-          />
-        </div>
-        <div className="mb-6">
-          <Input
-            label="Notas del Pedido"
-            name="notas"
-            value={clientDetails.notas}
-            onChange={handleChange}
-            placeholder="Ej: Sin cebolla, entregar en puerta 3"
-          />
-        </div>
-        <Button
-          onClick={handleConfirm}
-          disabled={isLoading}
-          gradient={true}
-          className="w-full font-bold py-2 px-4 rounded"
-        >
-          {isLoading ? 'Confirmando...' : 'Confirmar Cliente y Pedido'}
-        </Button>
+      <div className="mb-4">
+        <Input
+          label="Nombre Completo"
+          name="nombre"
+          value={clientDetails.nombre}
+          onChange={handleChange}
+          placeholder="Ej: Juan Pérez"
+          required
+          error={nombreError}
+        />
       </div>
+      <div className="mb-4">
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          value={clientDetails.email}
+          onChange={handleChange}
+          placeholder="Ej: juan.perez@example.com"
+          required
+          error={emailError}
+        />
+      </div>
+      <div className="mb-4">
+        <Input
+          label="Teléfono"
+          name="telefono"
+          value={clientDetails.telefono}
+          onChange={handleChange}
+          placeholder="Ej: 987654321"
+        />
+      </div>
+      <div className="mb-4">
+        <Input
+          label="Dirección"
+          name="direccion"
+          value={clientDetails.direccion}
+          onChange={handleChange}
+          placeholder="Ej: Av. Los Girasoles 123"
+        />
+      </div>
+      <div className="mb-6">
+        <Input
+          label="Notas del Pedido"
+          name="notas"
+          value={clientDetails.notas}
+          onChange={handleChange}
+          placeholder="Ej: Sin cebolla, entregar en puerta 3"
+        />
+      </div>
+      <Button
+        onClick={handleConfirm}
+        disabled={isLoading}
+        gradient={true}
+        className="w-full font-bold py-2 px-4 rounded"
+      >
+        {isLoading ? 'Confirmando...' : 'Confirmar Cliente y Pedido'}
+      </Button>
     </Modal>
   );
 };

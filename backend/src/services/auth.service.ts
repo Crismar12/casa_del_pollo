@@ -14,7 +14,7 @@ export const authService = {
   async verifyCredentials(email: string, contrasena: string): Promise<AuthTokens | null> {
     const user = await authRepository.findByEmail(email);
 
-    if (!user || !(await bcrypt.compare(contrasena, user.contrasena))) {
+    if (!user || !user.activo || !(await bcrypt.compare(contrasena, user.contrasena))) {
       return null;
     }
 
@@ -64,5 +64,27 @@ export const authService = {
     const user = await authRepository.create(nombre, email, hash, rol);
     const { contrasena: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  },
+
+  async listUsers(search?: string, includeInactive = false): Promise<Omit<Usuario, 'contrasena'>[]> {
+    return authRepository.getAll(search, includeInactive);
+  },
+
+  async getUserById(id: string): Promise<Omit<Usuario, 'contrasena'> | null> {
+    const user = await authRepository.findById(id);
+    if (!user) return null;
+    const { contrasena: _, ...rest } = user;
+    return rest;
+  },
+
+  async updateUser(id: string, data: { nombre?: string; email?: string; rol?: string; activo?: boolean }): Promise<Omit<Usuario, 'contrasena'> | null> {
+    return authRepository.update(id, data);
+  },
+
+  async deactivateUser(id: string, currentUserId: string): Promise<Omit<Usuario, 'contrasena'> | null> {
+    if (String(id) === String(currentUserId)) {
+      throw new Error('No puedes desactivar tu propia cuenta');
+    }
+    return authRepository.deactivate(id);
   },
 };

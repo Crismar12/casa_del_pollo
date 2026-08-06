@@ -8,7 +8,10 @@ import OrdersPage from '../pages/OrdersPage';
 import { AdminPage } from '../pages/AdminPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import PrivateRoutes from "../routes/PrivateRoutes";
+import AdminRoute from "../routes/AdminRoute";
 import Login from '../pages/Login';
+import { ErrorBoundary } from '../shared/components/ErrorBoundary';
+
 export const AppRouter = () => {
   return (
     <Router>
@@ -20,9 +23,11 @@ export const AppRouter = () => {
         <Route
           path="/"
           element={
-            <PrivateRoutes>
-              <App />
-            </PrivateRoutes>
+            <ErrorBoundary>
+              <PrivateRoutes>
+                <App />
+              </PrivateRoutes>
+            </ErrorBoundary>
           }
         >
           {/* Página principal = productos */}
@@ -30,7 +35,7 @@ export const AppRouter = () => {
           <Route path="producto" element={<ProductPage />} />
           <Route path="carrito" element={<CartPage />} />
           <Route path="pedidos" element={<OrdersPage />} />
-          <Route path="admin" element={<AdminPage />} />
+          <Route path="admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
