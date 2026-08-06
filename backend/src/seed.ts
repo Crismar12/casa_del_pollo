@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from 'pg';
 import bcrypt from 'bcrypt';
 import { v2 as cloudinary } from 'cloudinary';
+import './config/cloudinary';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
