@@ -19,9 +19,9 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
   }[type];
 
   const bgColor = {
-    success: 'bg-green-50',
-    error: 'bg-red-50',
-    info: 'bg-blue-50',
+    success: 'bg-green-50 dark:bg-green-900/30',
+    error: 'bg-red-50 dark:bg-red-900/30',
+    info: 'bg-blue-50 dark:bg-blue-900/30',
   }[type];
 
   const textColor = {
@@ -32,7 +32,8 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
 
   return (
     <div
-      aria-live="assertive"
+      role="alert"
+      aria-live="polite"
       className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-50"
     >
       <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
@@ -59,7 +60,7 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
                         action.onClick();
                         onClose();
                       }}
-                      className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold bg-white text-green-700 border border-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold bg-white dark:bg-gray-800 text-green-700 border border-green-300 hover:bg-green-50 dark:hover:bg-green-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
                       {action.label}
                     </button>
@@ -68,7 +69,7 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
                 <div className="ml-4 flex flex-shrink-0">
                   <button
                     type="button"
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="p-1 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     onClick={onClose}
                   >
                     <span className="sr-only">Close</span>

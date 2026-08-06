@@ -64,9 +64,9 @@ export const CartView = () => {
                 <div className="grid lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-3 space-y-4">
                         {cartItems.length === 0 ? (
-                            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                                <ShoppingCart className="w-24 h-24 mx-auto text-gray-300 mb-4" />
-                                <p className="text-gray-500 text-lg">Tu carrito está vacío</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
+                                <ShoppingCart className="w-24 h-24 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                                <p className="text-gray-500 dark:text-gray-400 text-lg">Tu carrito está vacío</p>
                                 <button
                                     onClick={() => navigate("/producto")}
                                     className="mt-6 w-full bg-linear-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg"
@@ -78,7 +78,7 @@ export const CartView = () => {
                             cartItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-wrap items-center gap-4 lg:gap-6"
+                                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 flex flex-wrap items-center gap-4 lg:gap-6"
                                 >
                                     <div className="bg-linear-to-br from-red-100 to-orange-100 w-20 h-20 rounded-lg flex items-center justify-center text-4xl">
                                         <img
@@ -89,7 +89,7 @@ export const CartView = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-bold text-lg">{item.name}</h3>
-                                        <p className="text-gray-600 text-sm">
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                                             {item.description}
                                         </p>
                                         <p className="text-red-600 font-bold">
@@ -99,7 +99,7 @@ export const CartView = () => {
                                     <div className="flex items-center space-x-3">
                                         <button
                                             onClick={() => handleUpdateQuantity(item, -1)}
-                                            className="bg-gray-200 p-2 rounded-lg"
+                                            className="bg-gray-200 dark:bg-gray-700 p-2 rounded-lg"
                                         >
                                             <Minus className="w-4 h-4" />
                                         </button>
@@ -125,7 +125,7 @@ export const CartView = () => {
                     </div>
                     {cartItems.length > 0 && (
                         <div className="lg:col-span-3">
-                            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-24">
                                 <h3 className="text-xl font-bold mb-4">Resumen</h3>
                                 <div className="space-y-3 mb-6">
                                     {cartItems.map((item) => (
@@ -142,7 +142,7 @@ export const CartView = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="border-t pt-4 mb-6">
+                                <div className="border-t dark:border-gray-700 pt-4 mb-6">
                                     <div className="flex justify-between text-xl font-bold">
                                         <span>Total:</span>
                                         <span className="text-red-600">

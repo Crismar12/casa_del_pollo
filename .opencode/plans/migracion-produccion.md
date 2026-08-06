@@ -182,7 +182,7 @@ alrededor. Cloudinary es el estándar para imágenes en apps serverless.
 2. `feat: crear componente DarkModeToggle`
 3. `feat: crear componente SkeletonLoader reutilizable`
 4. `feat: crear componente EmptyState con ilustración y CTA`
-5. `feat: agregar splash screen animado`
+5. `feat: agregar splash screen animado`    
 6. `feat: agregar transiciones y animaciones a componentes`
 7. `feat: mejorar accesibilidad (a11y) con aria-labels y roles`
 

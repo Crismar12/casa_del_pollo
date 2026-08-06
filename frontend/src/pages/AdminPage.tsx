@@ -78,7 +78,7 @@ export const AdminPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Panel de Administración</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Panel de Administración</h1>
         <button
           onClick={handleOrderUpdated}
           disabled={loading}
@@ -90,7 +90,7 @@ export const AdminPage = () => {
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-200">
+      <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-200 dark:border-gray-700">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -98,7 +98,7 @@ export const AdminPage = () => {
             className={`flex items-center gap-2 px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-red-600 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <tab.icon className="w-5 h-5" />
@@ -110,7 +110,7 @@ export const AdminPage = () => {
       {activeTab === 'dashboard' && (
         <div className="space-y-8">
           <DemoBanner onResetComplete={refetch} />
-          <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg px-4 py-3">
+          <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 text-blue-800 dark:text-blue-300 rounded-lg px-4 py-3">
             <Info className="w-5 h-5 mt-0.5 shrink-0" />
             <p className="text-sm">
               Las ventas, el ticket promedio y los gráficos consideran los pedidos con estado <strong>"entregado"</strong>

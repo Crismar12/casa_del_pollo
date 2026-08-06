@@ -16,13 +16,13 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyle =
-    "px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300 ease-in-out sm:px-4 sm:py-2 sm:text-base";
+    "px-3 py-1.5 text-sm rounded-md font-medium transition-all duration-300 ease-in-out sm:px-4 sm:py-2 sm:text-base active:scale-95 transition-transform";
 
   const gradientStyles = "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg";
 
   const variants = {
     primary: "bg-orange-600 text-white hover:bg-orange-700",
-    secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
+    secondary: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600",
     info: "bg-blue-600 text-white hover:bg-blue-700",
   };
 

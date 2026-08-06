@@ -30,7 +30,7 @@ export const Navigation: React.FC = () => {
         `flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
           isActive
             ? 'bg-linear-to-r from-orange-500 to-red-600 text-white'
-            : 'text-gray-700 hover:bg-gray-100'
+            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
         }`
       }
     >
@@ -40,7 +40,7 @@ export const Navigation: React.FC = () => {
   );
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-30">
+    <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -50,7 +50,7 @@ export const Navigation: React.FC = () => {
                   {renderNavLink(to, text, Icon)}
                 </div>
               ))}
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={handleLogout}
                   className="flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg"
@@ -62,7 +62,7 @@ export const Navigation: React.FC = () => {
             </HamburgerMenu>
 
            
-            <NavLink to="/" className="ml-4 text-xl font-bold text-gray-900">
+            <NavLink to="/" className="ml-4 text-xl font-bold text-gray-900 dark:text-gray-100">
               🐔 El Paraíso del Pollo
             </NavLink>
           </div>

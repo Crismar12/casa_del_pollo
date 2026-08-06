@@ -34,8 +34,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order: initialOrder }) => 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
           <div className="md:col-span-1">
             <h3 className="font-bold text-xl mb-1">Pedido #{orderToDisplay.id.substring(0, 8)}</h3>
-            <p className="text-sm text-gray-600">Cliente: {orderToDisplay.client}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{formatDateTimeLocal(orderToDisplay.createdAt)}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Cliente: {orderToDisplay.client}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatDateTimeLocal(orderToDisplay.createdAt)}</p>
           </div>
           <div className="md:col-span-2">
             <OrderTimeline currentStatus={orderToDisplay.status} />
@@ -51,11 +51,11 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order: initialOrder }) => 
           </div>
         </div>
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-gray-200 animate-fade-in-down">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 animate-fade-in-down">
             {loading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                <p className="ml-3 text-gray-600">Cargando detalles...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+                <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando detalles...</p>
               </div>
             ) : (
               <>
@@ -63,7 +63,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order: initialOrder }) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p><strong>Método de Pago:</strong> {orderToDisplay.paymentMethod}</p>
-                    <p><strong>Estado:</strong> <span className="font-medium p-1 rounded-md bg-blue-100 text-blue-800">{orderToDisplay.status}</span></p>
+                    <p><strong>Estado:</strong> <span className="font-medium p-1 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">{orderToDisplay.status}</span></p>
                   </div>
                   <div>
                     <h5 className="font-semibold mb-1">Productos:</h5>

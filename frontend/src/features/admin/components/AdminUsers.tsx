@@ -77,7 +77,7 @@ export const AdminUsers: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Usuarios</h2>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Usuarios</h2>
         <button
           onClick={() => setIsCreateOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -88,20 +88,20 @@ export const AdminUsers: React.FC = () => {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
         <input
           type="text"
           placeholder="Buscar por nombre o email..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
         />
       </div>
 
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando usuarios...</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando usuarios...</p>
         </div>
       ) : error ? (
         <div className="text-center py-8 text-red-600">
@@ -111,14 +111,14 @@ export const AdminUsers: React.FC = () => {
           </button>
         </div>
       ) : users.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Users className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <p>No se encontraron usuarios</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3">Email</th>
@@ -129,16 +129,16 @@ export const AdminUsers: React.FC = () => {
             </thead>
             <tbody>
               {users.map(user => (
-                <tr key={user.idusuario} className={`bg-white border-b hover:bg-gray-50 ${!user.activo ? 'opacity-60' : ''}`}>
-                  <td className="px-4 py-3 font-medium text-gray-900">{user.nombre}</td>
-                  <td className="px-4 py-3 text-gray-500">{user.email}</td>
+                <tr key={user.idusuario} className={`bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${!user.activo ? 'opacity-60' : ''}`}>
+                  <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{user.nombre}</td>
+                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{user.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs ${user.rol === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs ${user.rol === 'admin' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'}`}>
                       {user.rol === 'admin' ? 'Admin' : 'Vendedor'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs ${user.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs ${user.activo ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
                       {user.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
@@ -192,7 +192,7 @@ export const AdminUsers: React.FC = () => {
               : <>¿Deseas <strong>reactivar</strong> a "{userToToggle?.nombre}"?</>
             }
           </p>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {userToToggle?.activo
               ? 'El usuario no podrá iniciar sesión, pero sus registros históricos se conservarán.'
               : 'El usuario podrá volver a iniciar sesión normalmente.'
@@ -200,7 +200,7 @@ export const AdminUsers: React.FC = () => {
           </p>
           <div className="flex justify-center gap-4">
             <button onClick={() => { setIsDeactivateOpen(false); setUserToToggle(null); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
               Cancelar
             </button>
             <button onClick={confirmToggleActive}
@@ -246,21 +246,21 @@ const EditUserForm: React.FC<{ user: Usuario; currentUserId?: string; onSaved: (
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>}
+      {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded">{error}</p>}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
         <input value={nombre} onChange={e => setNombre(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+          className="w-full text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
         <input value={email} onChange={e => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
+          className="w-full text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rol</label>
         <select value={rol} onChange={e => setRol(e.target.value)} disabled={isSelf}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500">
+          className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:disabled:text-gray-500">
           <option value="vendedor">Vendedor</option>
           <option value="admin">Admin</option>
         </select>
@@ -268,7 +268,7 @@ const EditUserForm: React.FC<{ user: Usuario; currentUserId?: string; onSaved: (
       </div>
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
           Cancelar
         </button>
         <button type="submit" disabled={submitting}

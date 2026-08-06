@@ -12,15 +12,15 @@ export const ProductList: React.FC<ProductListProps> = ({ selectedCategoryId }) 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        <p className="ml-3 text-gray-600 text-lg">Cargando productos...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+        <p className="ml-3 text-gray-600 dark:text-gray-400 text-lg">Cargando productos...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-10 bg-red-100 text-red-700 rounded-lg px-4 text-lg">
+      <div className="text-center py-10 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg px-4 text-lg">
         <p>Error al cargar productos: {error}</p>
       </div>
     );

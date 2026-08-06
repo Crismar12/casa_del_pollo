@@ -30,7 +30,7 @@ const OrdersPage = () => {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold">Gestión de Pedidos</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">Gestión de Pedidos</h1>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -52,7 +52,7 @@ const OrdersPage = () => {
         </div>
       )}
       {error && (
-        <div className="text-center py-10 bg-red-100 text-red-700 rounded-lg">
+        <div className="text-center py-10 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg">
           <p>Error al cargar los pedidos: {error}</p>
         </div>
       )}

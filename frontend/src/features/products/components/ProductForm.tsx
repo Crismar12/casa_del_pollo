@@ -151,8 +151,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
         {isEditing ? 'Editar Producto' : 'Agregar Producto'}
       </h3>
 
@@ -167,7 +167,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
         />
 
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700 mb-1">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Descripción
           </label>
           <textarea
@@ -175,7 +175,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
             onChange={(e) => setDescripcion(e.target.value)}
             placeholder="Descripción del producto"
             rows={3}
-            className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
         </div>
 
@@ -198,13 +198,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
         </div>
 
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700 mb-1">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Categoría
           </label>
           <select
             value={categoriaId}
             onChange={(e) => setCategoriaId(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
             disabled={categoriesLoading}
           >
             <option value="">Sin categoría</option>
@@ -217,7 +217,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
         </div>
 
         <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700 mb-1">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Imagen del producto
           </label>
           <input
@@ -233,7 +233,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
               <img
                 src={imgUrl}
                 alt="Vista previa"
-                className="w-full h-40 object-contain rounded-md border border-gray-200"
+                className="w-full h-40 object-contain rounded-md border border-gray-200 dark:border-gray-700"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
                 }}
@@ -251,18 +251,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="w-full h-40 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-colors disabled:opacity-50"
+              className="w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors disabled:opacity-50"
             >
               {uploading ? (
                 <>
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
-                  <span className="text-sm text-gray-500">Subiendo imagen...</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Subiendo imagen...</span>
                 </>
               ) : (
                 <>
-                  <Image className="w-8 h-8 text-gray-400" />
-                  <span className="text-sm text-gray-500">Seleccionar imagen</span>
-                  <span className="text-xs text-gray-400">JPEG, PNG o WEBP (máx. 5MB)</span>
+                  <Image className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Seleccionar imagen</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">JPEG, PNG o WEBP (máx. 5MB)</span>
                 </>
               )}
             </button>
@@ -275,19 +275,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
             id="activo"
             checked={activo}
             onChange={(e) => setActivo(e.target.checked)}
-            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 rounded"
           />
-          <label htmlFor="activo" className="text-sm font-medium text-gray-700">
+          <label htmlFor="activo" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Producto activo
           </label>
         </div>
 
         {error && (
-          <p className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded">{error}</p>
+          <p className="text-red-600 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
         )}
 
         {success && (
-          <p className="text-green-600 text-sm bg-green-50 px-3 py-2 rounded">{success}</p>
+          <p className="text-green-600 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
         )}
 
         <div className="flex gap-2">
@@ -295,7 +295,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
             type="submit"
             gradient={true}
             disabled={loading || uploading}
-            className="flex-1 py-2 rounded-lg font-bold shadow-md"
+            className="flex-1 py-2 rounded-lg font-bold shadow-md dark:shadow-gray-900/40"
           >
             {loading ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Crear Producto'}
           </Button>

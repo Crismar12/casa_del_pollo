@@ -16,14 +16,14 @@ export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; on
 
   return (
     <div
-      className={`p-6 z-20 transition-all duration-300 ease-in-out bg-white flex flex-col justify-between h-[calc(100vh-4rem)] fixed top-16 left-0
+      className={`p-6 z-20 transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 flex flex-col justify-between h-[calc(100vh-4rem)] fixed top-16 left-0
         ${isDesktop ? "w-56" : "w-full"}
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}
       onClick={() => { if (!isDesktop) onLinkClick(); }}
     >
 
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-2" role="navigation" aria-label="Menú principal">
         {links.map((link) => (
           <NavLink
             key={link.to}
@@ -33,7 +33,7 @@ export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; on
               `flex items-center px-6 py-2 rounded-md text-sm font-medium ${
                 isActive
                   ? "bg-linear-to-r from-orange-500 to-red-600 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`
             }
           >
@@ -45,7 +45,7 @@ export const AppSidebar: React.FC<{ isOpen: boolean; onLinkClick: () => void; on
       <div className="mt-auto">
         <button
           onClick={onLogoutClick}
-          className="w-full px-6 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+          className="w-full px-6 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           Cerrar Sesión
         </button>
