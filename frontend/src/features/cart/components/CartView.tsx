@@ -88,11 +88,11 @@ export const CartView = () => {
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-bold text-lg">{item.name}</h3>
+                                        <h3 className="font-bold text-lg dark:text-gray-100">{item.name}</h3>
                                         <p className="text-gray-600 dark:text-gray-400 text-sm">
                                             {item.description}
                                         </p>
-                                        <p className="text-red-600 font-bold">
+                                        <p className="text-red-600 dark:text-red-400 font-bold">
                                             S/ {Number(item.price).toFixed(2)}
                                         </p>
                                     </div>
@@ -103,7 +103,7 @@ export const CartView = () => {
                                         >
                                             <Minus className="w-4 h-4" />
                                         </button>
-                                        <span className="font-bold text-lg w-8 text-center">
+                                        <span className="font-bold text-lg w-8 text-center dark:text-gray-100">
                                             {item.quantity}
                                         </span>
                                         <button
@@ -126,7 +126,7 @@ export const CartView = () => {
                     {cartItems.length > 0 && (
                         <div className="lg:col-span-3">
                             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-24">
-                                <h3 className="text-xl font-bold mb-4">Resumen</h3>
+                                <h3 className="text-xl font-bold mb-4 dark:text-gray-100">Resumen</h3>
                                 <div className="space-y-3 mb-6">
                                     {cartItems.map((item) => (
                                         <div
@@ -143,9 +143,9 @@ export const CartView = () => {
                                     ))}
                                 </div>
                                 <div className="border-t dark:border-gray-700 pt-4 mb-6">
-                                    <div className="flex justify-between text-xl font-bold">
+                                    <div className="flex justify-between text-xl font-bold dark:text-gray-100">
                                         <span>Total:</span>
-                                        <span className="text-red-600">
+                                        <span className="text-red-600 dark:text-red-400">
                                             S/ {Number(cartTotal).toFixed(2)}
                                         </span>
                                     </div>

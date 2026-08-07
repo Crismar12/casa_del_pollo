@@ -95,7 +95,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
-      <h3 className="text-lg font-bold mb-4">{title}</h3>
+      <h3 className="text-lg font-bold mb-4 dark:text-gray-100">{title}</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-900">
@@ -214,8 +214,8 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
               <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg mb-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Productos</p>
                 <ul className="list-disc list-inside">
-                  {selectedOrder.products.map((product, index) => (
-                    <li key={index} className="text-black dark:text-white">
+                  {selectedOrder.products.map((product) => (
+                    <li key={product.id} className="text-black dark:text-white">
                       <span className="font-bold">{product.name}</span> (x{product.quantity})
                     </li>
                   ))}
@@ -224,7 +224,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
 
               {selectedOrder.notas && (
                 <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 p-3 rounded-lg mb-4">
-                  <p className="text-sm text-amber-700 mb-1 font-medium">Notas del pedido</p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mb-1 font-medium">Notas del pedido</p>
                   <p className="text-black dark:text-white">{selectedOrder.notas}</p>
                 </div>
               )}
@@ -252,7 +252,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
                     <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">
                       ¿Quieres marcar este pedido como entregado?
                     </p>
-                    <p className="text-xs text-amber-700 mb-4">
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mb-4">
                       Esta acción es irreversible: una vez entregado, no podrás volver a cambiar el estado del pedido.
                     </p>
                     <div className="flex justify-center gap-2">

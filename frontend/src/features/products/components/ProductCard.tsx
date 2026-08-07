@@ -36,7 +36,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <h3 className="font-bold text-lg sm:text-xl mb-2 text-gray-800 dark:text-gray-100">{product.name}</h3>
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 flex-grow line-clamp-3">{product.description}</p>
         <div className="flex justify-between items-center mt-auto">
-          <span className="text-red-600 font-extrabold text-xl sm:text-2xl">S/. {Number(product.price).toFixed(2)}</span>
+          <span className="text-red-600 dark:text-red-400 font-extrabold text-xl sm:text-2xl">S/. {Number(product.price).toFixed(2)}</span>
           <button
             onClick={handleAddToCart}
             aria-label={`Añadir ${product.name} al carrito`}

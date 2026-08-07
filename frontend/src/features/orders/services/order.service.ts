@@ -37,15 +37,15 @@ interface BackendOrderDetails extends BackendOrder {
 export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId: number; nombrecliente: string; direccion?: string; notas?: string }): Promise<Order> => {
   try {
     const payload: CreateOrderFrontendPayload = {
-      clientId: clientInfo.clientId,
+      clientId: Number(clientInfo.clientId),
       userId: 1, 
       nombrecliente: clientInfo.nombrecliente,
       direccion: clientInfo.direccion,
       notas: clientInfo.notas,
       items: cartItems.map(item => ({
-        productId: parseInt(item.id), 
+        productId: Number(item.id), 
         quantity: item.quantity,
-        price: item.price,
+        price: Number(item.price),
       })),
     };
 

@@ -118,7 +118,7 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
       {loading ? (
         <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
-        <div className="text-center py-8 text-red-600">
+        <div className="text-center py-8 text-red-600 dark:text-red-400">
           <p>{error}</p>
           <button
             onClick={fetchCategories}

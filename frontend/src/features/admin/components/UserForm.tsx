@@ -77,7 +77,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
 
         <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Rol<span className="text-red-500">*</span>
+            Rol<span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <select
             value={rol}
@@ -90,11 +90,11 @@ export const UserForm: React.FC<UserFormProps> = ({ onUserCreated }) => {
         </div>
 
         {error && (
-          <p className="text-red-600 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
+          <p className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
         )}
 
         {success && (
-          <p className="text-green-600 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
+          <p className="text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
         )}
 
         <Button

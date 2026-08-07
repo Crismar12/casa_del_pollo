@@ -7,6 +7,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { corsOptions } from './config/cors';
 import { apiLimiter } from './middleware/rateLimiter';
+import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 
 dotenv.config();
@@ -18,6 +19,7 @@ import clientRoutes from './routes/client.routes';
 import orderRoutes from './routes/order.routes';
 import adminDashboardRoutes from './routes/adminDashboard.routes';
 import uploadRoutes from './routes/upload.routes';
+import { runMigrations } from './config/migrations';
 
 const app = express();
 
@@ -42,9 +44,16 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
-  logger.info(`Servidor Express escuchando en http://localhost:${PORT}`);
-  logger.info('Backend started successfully!');
+runMigrations().then(() => {
+  app.listen(PORT, () => {
+    logger.info(`Servidor Express escuchando en http://localhost:${PORT}`);
+    logger.info('Backend started successfully!');
+  });
+}).catch(error => {
+  logger.error('Error ejecutando migraciones:', error instanceof Error ? error.message : error);
+  process.exit(1);
 });

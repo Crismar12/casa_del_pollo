@@ -137,7 +137,7 @@ export const AdminProducts: React.FC = () => {
       {loading ? (
         <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
-        <div className="text-center py-8 text-red-600">
+        <div className="text-center py-8 text-red-600 dark:text-red-400">
           <p>{error}</p>
           <button
             onClick={fetchProducts}

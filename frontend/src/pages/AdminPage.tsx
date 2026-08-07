@@ -10,6 +10,7 @@ export const AdminPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [refreshKey, setRefreshKey] = useState(0);
   const [categoriesRefreshKey, setCategoriesRefreshKey] = useState(0);
+  const [seedResetKey, setSeedResetKey] = useState(0);
 
   const handleOrderUpdated = useCallback(() => {
     refetch();
@@ -19,6 +20,13 @@ export const AdminPage = () => {
   const handleCategoryChanged = useCallback(() => {
     setCategoriesRefreshKey(k => k + 1);
   }, []);
+
+  const handleSeedReset = useCallback(() => {
+    refetch();
+    setRefreshKey(k => k + 1);
+    setCategoriesRefreshKey(k => k + 1);
+    setSeedResetKey(k => k + 1);
+  }, [refetch]);
 
   if (loading) {
     return (
@@ -77,17 +85,8 @@ export const AdminPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Panel de Administración</h1>
-        <button
-          onClick={handleOrderUpdated}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Actualizar datos del dashboard"
-        >
-          <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-          Actualizar
-        </button>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-200 dark:border-gray-700">
@@ -109,7 +108,7 @@ export const AdminPage = () => {
 
       {activeTab === 'dashboard' && (
         <div className="space-y-8">
-          <DemoBanner onResetComplete={refetch} />
+          <DemoBanner onResetComplete={handleSeedReset} />
           <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 text-blue-800 dark:text-blue-300 rounded-lg px-4 py-3">
             <Info className="w-5 h-5 mt-0.5 shrink-0" />
             <p className="text-sm">
@@ -145,7 +144,7 @@ export const AdminPage = () => {
             <TarjetaDashboard
               title="Ventas esta semana"
               value={`S/ ${summary?.weeklyComparison.thisWeekSales.toFixed(2) || '0.00'}`}
-              footer={`${summary?.weeklyComparison.salesChange ?? 0 >= 0 ? '+' : ''}${summary?.weeklyComparison.salesChange ?? 0}% vs semana pasada`}
+              footer={`${(summary?.weeklyComparison.salesChange ?? 0) >= 0 ? '+' : ''}${(summary?.weeklyComparison.salesChange ?? 0).toFixed(0)}% vs semana pasada`}
               color="gradient"
             />
             <TarjetaDashboard
@@ -156,17 +155,17 @@ export const AdminPage = () => {
             />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PedidosRecientes onOrderUpdated={handleOrderUpdated} />
-            <ProductosMasVendidos key={refreshKey} />
+            <PedidosRecientes key={`seed-${seedResetKey}`} onOrderUpdated={handleOrderUpdated} />
+            <ProductosMasVendidos key={`chart-${refreshKey}`} />
           </div>
           <div className="w-full">
-            <ResumenSemanal key={refreshKey} />
+            <ResumenSemanal key={`chart-${refreshKey}`} />
           </div>
         </div>
       )}
 
       {activeTab === 'productos' && (
-        <AdminProducts key={categoriesRefreshKey} />
+        <AdminProducts key={`cat-${categoriesRefreshKey}`} />
       )}
 
       {activeTab === 'categorias' && (
