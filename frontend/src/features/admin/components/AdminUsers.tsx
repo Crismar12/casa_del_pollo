@@ -102,7 +102,7 @@ export const AdminUsers: React.FC = () => {
       {loading ? (
         <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
-        <div className="text-center py-8 text-red-600">
+        <div className="text-center py-8 text-red-600 dark:text-red-400">
           <p>{error}</p>
           <button onClick={fetchUsers} className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
             Reintentar
@@ -244,7 +244,7 @@ const EditUserForm: React.FC<{ user: Usuario; currentUserId?: string; onSaved: (
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/30 p-2 rounded">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-2 rounded">{error}</p>}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
         <input value={nombre} onChange={e => setNombre(e.target.value)}
@@ -262,7 +262,7 @@ const EditUserForm: React.FC<{ user: Usuario; currentUserId?: string; onSaved: (
           <option value="vendedor">Vendedor</option>
           <option value="admin">Admin</option>
         </select>
-        {isSelf && <p className="text-xs text-amber-600 mt-1">No puedes cambiar tu propio rol por seguridad.</p>}
+        {isSelf && <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">No puedes cambiar tu propio rol por seguridad.</p>}
       </div>
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onCancel}

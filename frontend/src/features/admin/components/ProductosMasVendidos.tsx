@@ -49,7 +49,7 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
-      <h3 className="text-lg font-bold mb-1">{title}</h3>
+      <h3 className="text-lg font-bold mb-1 dark:text-gray-100">{title}</h3>
       <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">Histórico — de todos los pedidos</p>
       <div className="space-y-3">
         {products.map((product, index) => {

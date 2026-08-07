@@ -7,7 +7,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-4 py-3">
       <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{label}</p>
-      <p className="text-lg font-bold text-red-600">S/ {Number(payload[0].value).toFixed(2)}</p>
+      <p className="text-lg font-bold text-red-600 dark:text-red-400">S/ {Number(payload[0].value).toFixed(2)}</p>
     </div>
   );
 };
@@ -44,7 +44,7 @@ export const ResumenSemanal: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
-      <h3 className="text-lg font-bold mb-4">Resumen Semanal de Ventas</h3>
+      <h3 className="text-lg font-bold mb-4 dark:text-gray-100">Resumen Semanal de Ventas</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={summary}

@@ -101,11 +101,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ category, onCategory
         </div>
 
         {error && (
-          <p className="text-red-600 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
+          <p className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded">{error}</p>
         )}
 
         {success && (
-          <p className="text-green-600 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
+          <p className="text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/30 px-3 py-2 rounded">{success}</p>
         )}
 
         <div className="flex gap-2">

@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 const orderItemSchema = z.object({
-  productId: z.number().int().positive('ID de producto inválido'),
-  quantity: z.number().int().positive('Cantidad debe ser al menos 1'),
-  price: z.number().positive('Precio debe ser positivo'),
+  productId: z.coerce.number().int().positive('ID de producto inválido'),
+  quantity: z.coerce.number().int().positive('Cantidad debe ser al menos 1'),
+  price: z.coerce.number().positive('Precio debe ser positivo'),
 });
 
 export const createOrderSchema = z.object({
-  clientId: z.number().int().positive('ID de cliente requerido'),
-  userId: z.number().int().positive('ID de usuario requerido'),
+  clientId: z.coerce.number().int().positive('ID de cliente requerido'),
+  userId: z.coerce.number().int().positive('ID de usuario requerido'),
   nombrecliente: z.string().min(1, 'Nombre del cliente es requerido'),
   direccion: z.string().optional(),
   notas: z.string().optional(),

@@ -50,7 +50,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-linear-to-r from-orange-400 via-red-500 to-orange-700">
       <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl w-full max-w-md text-center border border-orange-300">
         <div className="mb-4">
-          <h1 className="text-3xl font-extrabold text-orange-600 drop-shadow-sm">
+          <h1 className="text-3xl font-extrabold text-orange-600 dark:text-orange-400 drop-shadow-sm">
             🐔 El Paraíso del Pollo
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm font-medium">
@@ -89,13 +89,13 @@ export default function Login() {
         </form>
 
         {generalError && (
-          <p className="mt-4 text-red-600 font-medium bg-red-50 dark:bg-red-900/30 py-1 rounded">
+          <p className="mt-4 text-red-600 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/30 py-1 rounded">
             {generalError}
           </p>
         )}
 
         <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 rounded-lg text-left">
-          <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2">
+          <p className="text-xs font-semibold text-orange-700 dark:text-orange-300 uppercase tracking-wide mb-2">
             Credenciales de demostración
           </p>
           <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">

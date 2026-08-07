@@ -12,7 +12,7 @@ export const AppFooter = () => (
         href="https://github.com/Crismar12"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-red-500 hover:text-red-700 font-medium"
+        className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
       >
         Francis Esculpi
       </a>

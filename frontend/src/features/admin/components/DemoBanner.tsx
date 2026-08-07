@@ -29,7 +29,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ onResetComplete }) => {
             <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
               Modo Demo — Los datos se reinician con el botón
             </p>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
               Credenciales: admin@demo.com / admin123
             </p>
           </div>
@@ -46,7 +46,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ onResetComplete }) => {
           </button>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-amber-700">¿Borrar todo y recargar?</span>
+            <span className="text-xs text-amber-700 dark:text-amber-300">¿Borrar todo y recargar?</span>
             <button
               onClick={handleReset}
               disabled={resetting}

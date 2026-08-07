@@ -22,11 +22,11 @@ const statusBackgroundColors = {
 };
 
 const statusTextColors = {
-  [ORDER_STATUS.PENDING]: 'text-orange-600',
-  [ORDER_STATUS.PREPARING]: 'text-yellow-600',
-  [ORDER_STATUS.DELIVERING]: 'text-blue-600',
-  [ORDER_STATUS.DELIVERED]: 'text-green-600',
-  [ORDER_STATUS.CANCELED]: 'text-red-600',
+  [ORDER_STATUS.PENDING]: 'text-orange-600 dark:text-orange-400',
+  [ORDER_STATUS.PREPARING]: 'text-yellow-600 dark:text-yellow-400',
+  [ORDER_STATUS.DELIVERING]: 'text-blue-600 dark:text-blue-400',
+  [ORDER_STATUS.DELIVERED]: 'text-green-600 dark:text-green-400',
+  [ORDER_STATUS.CANCELED]: 'text-red-600 dark:text-red-400',
 };
 
 export const OrderTimeline: React.FC<OrderTimelineProps> = ({ currentStatus }) => {

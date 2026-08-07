@@ -35,7 +35,7 @@ export const Input: React.FC<InputProps> = ({
     <div className="flex flex-col">
       {label && (
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {label}{required && <span className="text-red-500">*</span>}
+          {label}{required && <span className="text-red-500 dark:text-red-400">*</span>}
         </label>
       )}
       <input
@@ -48,7 +48,7 @@ export const Input: React.FC<InputProps> = ({
         className={inputClasses}
         aria-invalid={error ? 'true' : undefined}
       />
-      {error && <p className="text-red-500 text-xs mt-1" role="alert" aria-live="polite">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-xs mt-1" role="alert" aria-live="polite">{error}</p>}
     </div>
   );
 };
