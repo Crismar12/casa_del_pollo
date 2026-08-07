@@ -1,6 +1,7 @@
 import React from 'react';
 import { Drumstick, Soup, Coffee, PlusCircle } from 'lucide-react';
 import { useMostSoldProducts } from '../hooks/useMostSoldProducts';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 
 const productIcons: Record<string, React.ElementType> = {
   'Pollo': Drumstick,
@@ -22,9 +23,8 @@ export const ProductosMasVendidos: React.FC<ProductosMasVendidosProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 flex items-center justify-center h-48">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-        <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando productos más vendidos...</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">
+        <SkeletonLoader variant="card" count={5} />
       </div>
     );
   }

@@ -66,28 +66,67 @@ export const orderRepository = {
     return result.rows as DetallePedido[];
   },
 
-  async getAllOrders(status?: string, page: number = 1, limit: number = 6): Promise<{ orders: Pedido[], totalCount: number }> {
+  async getAllOrders(
+    status?: string,
+    page: number = 1,
+    limit: number = 6,
+    filters?: { search?: string; fechaDesde?: string; fechaHasta?: string; minTotal?: number; maxTotal?: number }
+  ): Promise<{ orders: Pedido[], totalCount: number }> {
     const offset = (page - 1) * limit;
-
-    let countQuery = 'SELECT COUNT(*) FROM pedido';
-    let dataQuery = 'SELECT * FROM pedido';
+    const conditions: string[] = [];
     const params: (string | number)[] = [];
     const countParams: (string | number)[] = [];
-    let paramIndex = 1;
+    let idx = 1;
+
+    const addCondition = (cond: string, value: string | number) => {
+      conditions.push(cond);
+      params.push(value);
+      countParams.push(value);
+    };
 
     if (status) {
-      countQuery += ` WHERE estado = $${paramIndex}`;
-      dataQuery += ` WHERE estado = $${paramIndex}`;
+      conditions.push(`estado = $${idx}`);
       params.push(status);
       countParams.push(status);
-      paramIndex++;
+      idx++;
+    }
+    if (filters?.search) {
+      conditions.push(`nombrecliente ILIKE $${idx}`);
+      params.push(`%${filters.search}%`);
+      countParams.push(`%${filters.search}%`);
+      idx++;
+    }
+    if (filters?.fechaDesde) {
+      conditions.push(`fecha >= $${idx}`);
+      params.push(filters.fechaDesde);
+      countParams.push(filters.fechaDesde);
+      idx++;
+    }
+    if (filters?.fechaHasta) {
+      conditions.push(`fecha <= $${idx}`);
+      params.push(filters.fechaHasta);
+      countParams.push(filters.fechaHasta);
+      idx++;
+    }
+    if (filters?.minTotal !== undefined) {
+      conditions.push(`total >= $${idx}`);
+      params.push(filters.minTotal);
+      countParams.push(filters.minTotal);
+      idx++;
+    }
+    if (filters?.maxTotal !== undefined) {
+      conditions.push(`total <= $${idx}`);
+      params.push(filters.maxTotal);
+      countParams.push(filters.maxTotal);
+      idx++;
     }
 
-    const countResult = await db.query(countQuery, countParams);
+    const where = conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : '';
+
+    const countResult = await db.query(`SELECT COUNT(*) FROM pedido${where}`, countParams);
     const totalCount = parseInt(countResult.rows[0].count, 10);
 
-    dataQuery += ' ORDER BY created_at DESC, idpedido DESC';
-    dataQuery += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    const dataQuery = `SELECT * FROM pedido${where} ORDER BY created_at DESC, idpedido DESC LIMIT $${idx} OFFSET $${idx + 1}`;
     params.push(limit, offset);
 
     const dataResult = await db.query(dataQuery, params);

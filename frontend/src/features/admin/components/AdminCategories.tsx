@@ -3,6 +3,7 @@ import { Modal } from './Modal';
 import { CategoryForm } from '../../products/components/CategoryForm';
 import { getCategories, deleteCategory, updateCategory } from '../../products/services/category.service';
 import { Tag, Pencil, Search, Plus, Power, PowerOff } from 'lucide-react';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 
 interface Category {
   id: string;
@@ -115,10 +116,7 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({ onCategoryChan
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando categorías...</p>
-        </div>
+        <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
         <div className="text-center py-8 text-red-600">
           <p>{error}</p>

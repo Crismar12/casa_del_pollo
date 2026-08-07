@@ -1,9 +1,11 @@
 import { useOrders } from '../features/orders/hooks/useOrders';
 import { OrderList } from '../shared/components/OrderList';
+import { OrderFilters } from '../features/orders/components/OrderFilters';
 import React from 'react';
 import { ORDER_STATUS } from '../features/orders/types';
 import type { OrderStatus } from '../features/orders/types';
 import { Button } from '../shared/components/iu';
+import { SkeletonLoader } from '../shared/components/iu/SkeletonLoader';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const statusFilters: (OrderStatus | undefined)[] = [
@@ -25,12 +27,16 @@ const statusLabels: Record<string, string> = {
 }
 
 const OrdersPage = () => {
-  const { orders, loading, error, filterByStatus, currentFilter, currentPage, totalPages, goToPage } = useOrders();
+  const { orders, loading, error, filterByStatus, applyFilters, currentFilter, currentPage, totalPages, goToPage } = useOrders();
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">Gestión de Pedidos</h1>
+      </div>
+
+      <div className="mb-4">
+        <OrderFilters onChange={applyFilters} />
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -47,8 +53,8 @@ const OrdersPage = () => {
       </div>
 
       {loading && (
-        <div className="text-center py-10">
-          <p>Cargando pedidos...</p>
+        <div className="py-6">
+          <SkeletonLoader variant="table-row" count={4} />
         </div>
       )}
       {error && (

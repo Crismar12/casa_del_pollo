@@ -97,8 +97,8 @@ export const orderService = {
     return newOrder;
   },
 
-  async listAllOrders(status?: string, page?: number, limit?: number): Promise<{ orders: Pedido[], totalCount: number }> {
-    const { orders, totalCount } = await orderRepository.getAllOrders(status, page, limit);
+  async listAllOrders(status?: string, page?: number, limit?: number, filters?: { search?: string; fechaDesde?: string; fechaHasta?: string; minTotal?: number; maxTotal?: number }): Promise<{ orders: Pedido[], totalCount: number }> {
+    const { orders, totalCount } = await orderRepository.getAllOrders(status, page, limit, filters);
     return { orders, totalCount };
   },
 
