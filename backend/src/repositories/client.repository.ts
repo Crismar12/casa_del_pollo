@@ -1,33 +1,18 @@
-import { supabase } from '../config/supabase';
+import { db } from '../config/database';
 import { Client, CreateClientPayload } from '../types/client.types';
 
 export const clientRepository = {
   async createClient(clientData: CreateClientPayload): Promise<Client> {
-    const { data, error } = await supabase
-      .from('cliente')
-      .insert(clientData)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Supabase error creating client:', error);
-      throw new Error('Could not create client');
-    }
-    return data as Client;
+    const result = await db.query(
+      'INSERT INTO cliente (nombre, telefono, direccion, email) VALUES ($1, $2, $3, $4) RETURNING *',
+      [clientData.nombre, clientData.telefono, clientData.direccion, clientData.email]
+    );
+    return result.rows[0] as Client;
   },
 
-  
   async findClientByEmail(email: string): Promise<Client | null> {
-    const { data, error } = await supabase
-      .from('cliente')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
-      console.error('Supabase error finding client by email:', error);
-      throw new Error('Could not find client by email');
-    }
-    return data as Client | null;
+    const result = await db.query('SELECT * FROM cliente WHERE email = $1', [email]);
+    if (result.rows.length === 0) return null;
+    return result.rows[0] as Client;
   },
 };

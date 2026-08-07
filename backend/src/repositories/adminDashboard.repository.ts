@@ -1,70 +1,62 @@
-import { supabase } from '../config/supabase';
+import { db } from '../config/database';
 import { MostSoldProduct, DailySalesData } from '../types/adminDashboard.types';
+
+const SALE_ORDER_FILTER = "(estado = 'entregado' OR (estado = 'cancelado' AND contabilizar_venta))";
+
+const localDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
 export const adminDashboardRepository = {
   async getMostSoldProducts(limit: number = 5): Promise<MostSoldProduct[]> {
-    const { data: detalleData, error: detalleError } = await supabase
-      .from('detallepedido')
-      .select(`
-        idproducto,
-        cantidad
-      `);
+    const detalleResult = await db.query(
+      `SELECT dp.idproducto,
+              SUM(dp.cantidad) AS sales_amount,
+              SUM(dp.subtotal) AS revenue
+       FROM detallepedido dp
+       JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
+       GROUP BY dp.idproducto
+       ORDER BY revenue DESC
+       LIMIT $1`,
+      [limit]
+    );
 
-    if (detalleError) {
-      console.error('Supabase error fetching detallepedido for most sold products:', detalleError);
-      throw new Error('Could not fetch order details for most sold products');
-    }
-
- 
-    const aggregatedSales = detalleData.reduce((acc: { [key: number]: number }, item) => {
-      acc[item.idproducto] = (acc[item.idproducto] || 0) + item.cantidad;
-      return acc;
-    }, {});
-
-
-    const sortedProductSales = Object.entries(aggregatedSales)
-      .sort(([, countA], [, countB]) => (countB as number) - (countA as number))
-      .slice(0, limit);
-
-
-    const topProductIds = sortedProductSales.map(([id]) => parseInt(id));
-
-    if (topProductIds.length === 0) {
+    if (detalleResult.rows.length === 0) {
       return [];
     }
 
-    const { data: productsData, error: productsError } = await supabase
-      .from('producto')
-      .select(`
-        idproducto,
-        nombre,
-        categoria_id,
-        categorias(nombre)
-      `)
-      .in('idproducto', topProductIds);
+    const topProductIds = detalleResult.rows.map((row: { idproducto: string }) => Number(row.idproducto));
 
-    if (productsError) {
-      console.error('Supabase error fetching product details for most sold products:', productsError);
-      throw new Error('Could not fetch product details for most sold products');
-    }
+    const productsResult = await db.query(
+      `SELECT p.idproducto, p.nombre, p.categoria_id, c.nombre AS categoria_nombre
+       FROM producto p
+       LEFT JOIN categorias c ON p.categoria_id = c.idcategoria
+       WHERE p.idproducto = ANY($1)`,
+      [topProductIds]
+    );
 
+    const totalRevenue = detalleResult.rows.reduce(
+      (sum: number, row: { revenue: string }) => sum + Number(row.revenue),
+      0
+    );
 
-    const totalSalesAmount = Object.values(aggregatedSales).reduce((sum, count) => sum + (count as number), 0);
-
-
-    const result: MostSoldProduct[] = sortedProductSales.map(([id, salesAmount]) => {
-      const product = productsData.find(p => p.idproducto === parseInt(id));
-      const categoryName = product?.categorias && product.categorias.length > 0 ? (product.categorias[0] as { nombre: string }).nombre : 'Unknown';
+    return detalleResult.rows.map((row: { idproducto: string; sales_amount: string; revenue: string }) => {
+      const product = productsResult.rows.find(
+        (p: { idproducto: string }) => Number(p.idproducto) === Number(row.idproducto)
+      );
+      const revenue = Number(row.revenue);
       return {
         id: product?.idproducto.toString() || '',
-        name: product?.nombre || 'Unknown',
-        category: categoryName,
-        salesAmount: salesAmount as number,
-        percentage: totalSalesAmount > 0 ? parseFloat(((salesAmount as number / totalSalesAmount) * 100).toFixed(2)) : 0,
+        name: product?.nombre || 'Desconocido',
+        category: product?.categoria_nombre || 'Sin categoría',
+        salesAmount: Number(row.sales_amount),
+        revenue,
+        percentage: totalRevenue > 0 ? parseFloat(((revenue / totalRevenue) * 100).toFixed(2)) : 0,
       };
     });
-
-    return result;
   },
 
   async getWeeklySalesSummary(): Promise<DailySalesData[]> {
@@ -72,173 +64,172 @@ export const adminDashboardRepository = {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 6);
 
-    const todayISO = today.toISOString().split('T')[0];
-    const sevenDaysAgoISO = sevenDaysAgo.toISOString().split('T')[0];
+    const todayISO = localDate(today);
+    const sevenDaysAgoISO = localDate(sevenDaysAgo);
 
-    const { data: pedidosData, error: pedidosError } = await supabase
-      .from('pedido')
-      .select('fecha, total')
-      .gte('fecha', sevenDaysAgoISO)
-      .lte('fecha', todayISO)
-      .order('fecha', { ascending: true });
-
-    if (pedidosError) {
-      console.error('Supabase error fetching pedidos for weekly summary:', pedidosError);
-      throw new Error('Could not fetch orders for weekly summary');
-    }
+    const result = await db.query(
+      `SELECT fecha::text AS fecha, total FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER} ORDER BY fecha ASC`,
+      [sevenDaysAgoISO, todayISO]
+    );
 
     const dailySalesMap: { [key: string]: number } = {};
-    pedidosData.forEach(pedido => {
+    result.rows.forEach((pedido: { fecha: string; total: string }) => {
       const day = pedido.fecha;
-      dailySalesMap[day] = (dailySalesMap[day] || 0) + pedido.total;
+      dailySalesMap[day] = (dailySalesMap[day] || 0) + Number(pedido.total);
     });
 
-    const result: DailySalesData[] = [];
+    const dailyResult: DailySalesData[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dayString = date.toISOString().split('T')[0];
+      const dayString = localDate(date);
       const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
-      result.push({
+      dailyResult.push({
         day: dayName.charAt(0).toUpperCase() + dayName.slice(1).replace('.', ''),
         earnings: dailySalesMap[dayString] || 0,
       });
     }
 
-    return result;
+    return dailyResult;
   },
 
   async getSalesToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', today)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching sales today:', error);
-      throw new Error('Could not fetch sales today');
-    }
-    return data.reduce((sum, order) => sum + (order.total || 0), 0);
+    const today = localDate(new Date());
+    const result = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
+      [today]
+    );
+    return parseFloat(result.rows[0].total) || 0;
   },
 
   async getOrdersToday(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
-    const { count, error } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('fecha', today);
-
-    if (error) {
-      console.error('Supabase error fetching orders today:', error);
-      throw new Error('Could not fetch orders today');
-    }
-    return count || 0;
+    const today = localDate(new Date());
+    const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [today]);
+    return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicket(): Promise<number> {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', today)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching average ticket:', error);
-      throw new Error('Could not fetch average ticket');
-    }
-
-    if (data.length === 0) {
-      return 0;
-    }
-    const totalSales = data.reduce((sum, order) => sum + (order.total || 0), 0);
-    return parseFloat((totalSales / data.length).toFixed(2));
+    const today = localDate(new Date());
+    const result = await db.query(
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
+      [today]
+    );
+    return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
   },
 
   async getCancellationRate(): Promise<number> {
-    const { count: totalOrdersCount, error: totalError } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true });
+    const totalResult = await db.query('SELECT COUNT(*) FROM pedido');
+    const totalOrdersCount = parseInt(totalResult.rows[0].count, 10);
 
-    if (totalError) {
-      console.error('Supabase error fetching total orders for cancellation rate:', totalError);
-      throw new Error('Could not fetch total orders for cancellation rate');
-    }
+    if (totalOrdersCount === 0) return 0;
 
-    const { count: cancelledOrdersCount, error: cancelledError } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('estado', 'cancelado');
+    const cancelledResult = await db.query(
+      "SELECT COUNT(*) FROM pedido WHERE estado = 'cancelado'"
+    );
+    const cancelledOrdersCount = parseInt(cancelledResult.rows[0].count, 10);
 
-    if (cancelledError) {
-      console.error('Supabase error fetching cancelled orders for cancellation rate:', cancelledError);
-      throw new Error('Could not fetch cancelled orders for cancellation rate');
-    }
-
-    if (totalOrdersCount === 0) {
-      return 0;
-    }
-
-    return parseFloat(((cancelledOrdersCount || 0) / (totalOrdersCount || 0) * 100).toFixed(2));
+    return parseFloat(((cancelledOrdersCount / totalOrdersCount) * 100).toFixed(2));
   },
 
   async getSalesYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', yesterdayISO)
-      .eq('estado', 'entregado');
-
-    if (error) {
-      console.error('Supabase error fetching sales yesterday:', error);
-      throw new Error('Could not fetch sales yesterday');
-    }
-    return data.reduce((sum, order) => sum + (order.total || 0), 0);
+    const result = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS total FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
+      [yesterdayISO]
+    );
+    return parseFloat(result.rows[0].total) || 0;
   },
 
   async getOrdersYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
-    const { count, error } = await supabase
-      .from('pedido')
-      .select('*', { count: 'exact', head: true })
-      .eq('fecha', yesterdayISO);
-
-    if (error) {
-      console.error('Supabase error fetching orders yesterday:', error);
-      throw new Error('Could not fetch orders yesterday');
-    }
-    return count || 0;
+    const result = await db.query('SELECT COUNT(*) FROM pedido WHERE fecha = $1', [yesterdayISO]);
+    return parseInt(result.rows[0].count, 10) || 0;
   },
 
   async getAverageTicketYesterday(): Promise<number> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString().split('T')[0];
+    const yesterdayISO = localDate(yesterday);
 
-    const { data, error } = await supabase
-      .from('pedido')
-      .select('total')
-      .eq('fecha', yesterdayISO)
-      .eq('estado', 'entregado');
+    const result = await db.query(
+      `SELECT COALESCE(AVG(total), 0) AS promedio FROM pedido WHERE fecha = $1 AND ${SALE_ORDER_FILTER}`,
+      [yesterdayISO]
+    );
+    return parseFloat(parseFloat(result.rows[0].promedio).toFixed(2)) || 0;
+  },
 
-    if (error) {
-      console.error('Supabase error fetching average ticket yesterday:', error);
-      throw new Error('Could not fetch average ticket yesterday');
+  async getWeeklyComparison(): Promise<{
+    thisWeekSales: number;
+    lastWeekSales: number;
+    thisWeekOrders: number;
+    lastWeekOrders: number;
+    salesChange: number;
+    ordersChange: number;
+  }> {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const thisMonday = new Date(today);
+    thisMonday.setDate(today.getDate() + offsetToMonday);
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setDate(thisMonday.getDate() - 7);
+    const lastSunday = new Date(thisMonday);
+    lastSunday.setDate(thisMonday.getDate() - 1);
+
+    const thisWeekStart = localDate(thisMonday);
+    const lastWeekStart = localDate(lastMonday);
+    const lastWeekEnd = localDate(lastSunday);
+
+    const thisWeekResult = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND ${SALE_ORDER_FILTER}`,
+      [thisWeekStart]
+    );
+    const lastWeekResult = await db.query(
+      `SELECT COALESCE(SUM(total), 0) AS sales, COUNT(*) AS orders FROM pedido WHERE fecha >= $1 AND fecha <= $2 AND ${SALE_ORDER_FILTER}`,
+      [lastWeekStart, lastWeekEnd]
+    );
+
+    const thisWeekSales = parseFloat(thisWeekResult.rows[0].sales) || 0;
+    const lastWeekSales = parseFloat(lastWeekResult.rows[0].sales) || 0;
+    const thisWeekOrders = parseInt(thisWeekResult.rows[0].orders, 10) || 0;
+    const lastWeekOrders = parseInt(lastWeekResult.rows[0].orders, 10) || 0;
+
+    const salesChange = lastWeekSales > 0
+      ? parseFloat(((thisWeekSales - lastWeekSales) / lastWeekSales * 100).toFixed(1))
+      : thisWeekSales > 0 ? 100 : 0;
+    const ordersChange = lastWeekOrders > 0
+      ? parseFloat(((thisWeekOrders - lastWeekOrders) / lastWeekOrders * 100).toFixed(1))
+      : thisWeekOrders > 0 ? 100 : 0;
+
+    return { thisWeekSales, lastWeekSales, thisWeekOrders, lastWeekOrders, salesChange, ordersChange };
+  },
+
+  async getTopCategory(): Promise<{ name: string; totalSales: number; orderCount: number }> {
+    const result = await db.query(
+      `SELECT c.nombre, COALESCE(SUM(dp.subtotal), 0) AS total_sales, COUNT(DISTINCT p.idpedido) AS order_count
+       FROM categorias c
+       LEFT JOIN producto pr ON pr.categoria_id = c.idcategoria
+       LEFT JOIN detallepedido dp ON dp.idproducto = pr.idproducto
+       LEFT JOIN pedido p ON p.idpedido = dp.idpedido AND (${SALE_ORDER_FILTER})
+       GROUP BY c.idcategoria, c.nombre
+       ORDER BY total_sales DESC
+       LIMIT 1`
+    );
+
+    if (result.rows.length === 0) {
+      return { name: 'N/A', totalSales: 0, orderCount: 0 };
     }
 
-    if (data.length === 0) {
-      return 0;
-    }
-    const totalSales = data.reduce((sum, order) => sum + (order.total || 0), 0);
-    return parseFloat((totalSales / data.length).toFixed(2));
+    return {
+      name: result.rows[0].nombre,
+      totalSales: parseFloat(result.rows[0].total_sales) || 0,
+      orderCount: parseInt(result.rows[0].order_count, 10) || 0,
+    };
   },
 };

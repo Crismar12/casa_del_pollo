@@ -1,0 +1,56 @@
+services:
+  - type: web
+    name: el-paraiso-del-pollo-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: TZ
+        value: America/Lima
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRATION
+        value: "1h"
+      - key: JWT_REFRESH_EXPIRATION
+        value: "7d"
+      - key: CORS_ORIGIN
+        value: ""
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+  - type: cron
+    name: el-paraiso-del-pollo-daily-close
+    runtime: node
+    plan: free
+    rootDir: backend
+    schedule: "0 8 * * *"
+    buildCommand: npm install
+    startCommand: npm run seed
+    envVars:
+      - key: TZ
+        value: America/Lima
+      - key: DATABASE_URL
+        sync: false
+      - key: SEED_FORCE_IMAGES
+        value: "0"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
