@@ -1,244 +1,197 @@
-# 🐔 El Paraíso del Pollo - Order Manager
+# 🐔 El Paraíso del Pollo — Gestor de Pedidos
 
-Restaurant order management system developed with React, TypeScript, Express, and Neon.tech (PostgreSQL).
+Sistema de gestión de pedidos para restaurante desarrollado con React, TypeScript, Express, PostgreSQL (Neon.tech) y Cloudinary.
 
-## Description
+## 🚀 Demo
 
-Modern web application for comprehensive restaurant order management, including administrative features, a product catalog, a shopping cart, and order tracking.
+| Rol | Email | Contraseña |
+|---|---|---|
+| Admin | `admin@demo.com` | `admin123` |
+| Vendedor | `vendedor@demo.com` | `vend123` |
 
-## Features
+Carga datos de demo con:
 
-- **User Authentication** with email and password
-- **Shopping Cart** with Product Management
-- **Order Management** with status tracking
-- **Complete Admin Panel** with sales dashboard and charts
-- **Responsive Design** for Mobile and Tablets
-- **Data Visualization** with Charts (Recharts)
-- **Modern UI** with Tailwind CSS and Headless UI
+```bash
+cd backend
+npm run seed
+```
 
-## Technology Stack
+## ✨ Funcionalidades
+
+- **Autenticación** — JWT con access + refresh tokens, bcrypt, roles (admin/vendedor)
+- **Menú de productos** — Catálogo con filtros por categoría, carrito de compras
+- **Pedidos** — Creación, seguimiento de estados (pendiente → preparación → reparto → entregado/cancelado), exportación PDF
+- **Panel admin** — Dashboard con KPIs, gráficos semanales, productos más vendidos, tasa de cancelación
+- **CRUD completo** — Productos, categorías y usuarios con soft-delete (nunca se borran registros con pedidos)
+- **Modo oscuro** — Toggle sol/luna con detección de preferencia del sistema, sin flash al cargar
+- **Seguridad** — Helmet, rate limiting, CORS, Zod validación, logger con masking de datos sensibles
+- **Lazy loading** — Imágenes, rutas code-split con React.lazy + Suspense, skeleton loaders
+- **Migraciones** — Sistema numerado con auto-ejecución al iniciar el servidor
+- **Responsive** — Mobile-first con Tailwind CSS, sidebar con overlay
+
+## 🛠 Stack tecnológico
 
 ### Frontend
-- **React 19.2** - UI Library
-- **TypeScript** - Static Typing
-- **Vite** - Build Tool and Dev Server
-- **React Router DOM** - Routing
-- **Redux Toolkit** - State Management
-- **Tailwind CSS** - Utility Styles
-- **Headless UI** - Accessible Components
-- **Heroicons & Lucide React** - Iconography
-- **Recharts** - Data Visualization
+| Tecnología | Uso |
+|---|---|
+| React 19 + TypeScript | UI y tipado |
+| Vite 7 | Build tool y dev server |
+| Redux Toolkit | Estado global (carrito) |
+| React Router DOM 7 | Routing con lazy loading |
+| Tailwind CSS 4 | Estilos utilitarios + dark mode |
+| Recharts | Gráficos del dashboard |
+| jspdf + jspdf-autotable | Exportación PDF |
+| Lucide React | Iconografía |
+| Headless UI | Componentes accesibles |
 
 ### Backend
-- **Node.js** with **Express**
-- **TypeScript**
-- **Neon.tech** - Serverless PostgreSQL
-- **pg** (node-postgres) - PostgreSQL client
-- **CORS** - Security Configuration
+| Tecnología | Uso |
+|---|---|
+| Node.js + Express 5 | API REST |
+| TypeScript | Tipado |
+| PostgreSQL (Neon.tech) | Base de datos serverless |
+| pg (node-postgres) | Driver PostgreSQL |
+| JWT + bcrypt | Autenticación y hash |
+| Zod | Validación de schemas |
+| Helmet | Headers de seguridad |
+| express-rate-limit | Rate limiting |
+| Cloudinary | Almacenamiento de imágenes |
+| geoip-lite | Detección de zona horaria |
+| @faker-js/faker | Datos de demo (seed) |
 
-## Project Structure
+## 📁 Estructura
 
 ```
-la-casa-de-pollo-gestor-pedidos/
-├── frontend/                       # Frontend (React + Vite)
-│   ├── src/
-│   │   ├── features/               # Features per Module
-│   │   │   ├── admin/
-│   │   │   ├── auth/
-│   │   │   ├── cart/
-│   │   │   ├── orders/
-│   │   │   └── products/
-│   │   ├── pages/                  # Application Pages
-│   │   ├── shared/                 # Shared Components and Utilities
-│   │   ├── store/                  # Redux Configuration
-│   │   ├── routes/                 # Route Configuration
-│   │   └── config/                 # General Configurations
-│   ├── public/                     # Static Files
-│   ├── index.html                  # Entry HTML
-│   ├── vite.config.ts              # Vite Configuration
-│   └── package.json                # Frontend Dependencies
-├── backend/                        # Backend API (Express)
+el-paraiso-del-pollo/
+├── frontend/
 │   └── src/
-│       ├── config/                 # Database configuration
-│       ├── controllers/            # HTTP controllers
-│       ├── repositories/           # Data access layer (SQL queries)
-│       ├── routes/                 # API routes
-│       ├── services/               # Business logic
-│       └── types/                  # TypeScript types
-├── db.sql                          # Database Script (PostgreSQL)
-├── README.md                       # Project Documentation
-└── .gitignore                      # Git ignore rules
+│       ├── features/          # Módulos: admin, auth, cart, orders, products
+│       ├── pages/             # Páginas: Login, ProductPage, CartPage, OrdersPage, AdminPage, NotFoundPage
+│       ├── shared/            # Componentes IU, hooks, context, utils
+│       ├── routes/            # AppRouter, PrivateRoutes, AdminRoute
+│       └── store/             # Redux store
+├── backend/
+│   ├── src/
+│   │   ├── config/            # DB, CORS, tokens, migraciones
+│   │   ├── controllers/       # HTTP handlers
+│   │   ├── middleware/         # Auth, authorize, rateLimiter, validate, errorHandler
+│   │   ├── repositories/      # SQL queries parametrizadas
+│   │   ├── routes/            # Definición de endpoints
+│   │   ├── schemas/           # Zod schemas de validación
+│   │   ├── services/          # Lógica de negocio
+│   │   ├── types/             # Interfaces TypeScript
+│   │   └── utils/             # Logger con masking
+│   └── migrations/            # SQLs numerados
+├── db.sql                     # Schema de referencia
+└── render.yaml                # Deploy en Render
 ```
 
-## Installation and Configuration
+## 🚀 Instalación local
 
-### Prerequisites
-- Node.js (version 18 or higher)
-- npm or yarn
-- A Neon.tech account (https://neon.tech)
-
-### Frontend Installation
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Development mode
-npm run dev
-
-# Production build
-npm run build
-
-# Build preview
-npm run preview
-
-# Run linter
-npm run lint
-```
-
-### Backend Installation
-
-```bash
-cd backend
-
-# Install dependencies
-npm install
-
-# Development mode
-npm run dev
-```
-
-### Environment Variables
-
-#### Frontend (`frontend/.env`)
-
-```env
-VITE_BACKEND_API_URL="http://localhost:4000"
-```
-
-See [`frontend/.env.example`](frontend/.env.example) for reference.
-
-#### Backend (`backend/.env`)
-
-```env
-DATABASE_URL="postgresql://neondb_owner:<YOUR_PASSWORD>@<YOUR_ENDPOINT>.neon.tech/neondb?sslmode=require"
-PORT=4000
-```
-
-Replace `<YOUR_PASSWORD>` and `<YOUR_ENDPOINT>` with your Neon.tech credentials.
-
-See [`backend/.env.example`](backend/.env.example) for reference.
-
-### Database Setup
-
-1. Log in to your [Neon.tech](https://neon.tech) dashboard
-2. Create a new project
-3. Copy the connection string from the dashboard
-4. Paste it in `backend/.env` as `DATABASE_URL`
-5. Run the `db.sql` script in the Neon SQL editor to create all tables
-
-## How to Start the App
-
-1. Install frontend dependencies:
-
-```bash
-cd frontend
-npm install
-```
-
-2. Install backend dependencies:
-
-```bash
-cd backend
-npm install
-```
-
-3. Configure environment variables:
-
-```bash
-# Frontend
-Copy-Item frontend\.env.example frontend\.env
-
-# Backend
-Copy-Item backend\.env.example backend\.env
-# Edit backend\.env and add your Neon DATABASE_URL
-```
-
-4. Set up the database in Neon.tech (see Database Setup above)
-
-5. Start the backend:
-
-```bash
-cd backend
-npm run dev
-```
-
-6. In another terminal, start the frontend:
-
-```bash
-cd frontend
-npm run dev
-```
-
-## Deployment
-
-### Frontend (Vercel)
-- **Framework:** Vite
-- **Root Directory:** `frontend`
-- **Build Command:** `npm run build`
-- **Output Directory:** `dist`
-
-### Backend (Render)
-- **Root Directory:** `backend`
-- **Build Command:** `npm install`
-- **Start Command:** `npm run dev`
-
-## Important Notes
-
-- The frontend uses `VITE_BACKEND_API_URL` to connect to the backend API.
-- The backend connects to Neon.tech PostgreSQL via `DATABASE_URL`.
-- If you change any `.env` file, restart the corresponding process.
-- Never commit `.env` files to version control.
-
-## Available Scripts
-
-### Frontend
-- `npm run dev` - Starts the development server
-- `npm run build` - Compiles the application for production
-- `npm run preview` - Previews the production build
-- `npm run lint` - Runs the ESLint linter
+### Requisitos
+- Node.js ≥ 18
+- Cuenta en [Neon.tech](https://neon.tech) (gratis)
+- Cuenta en [Cloudinary](https://cloudinary.com) (gratis)
 
 ### Backend
-- `npm run dev` - Starts the backend server with nodemon
 
-## Main Pages
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Editar .env con tus credenciales de Neon y Cloudinary
+npm run dev        # http://localhost:4000
+```
 
-- **Login** - User authentication
-- **Products** - Catalog of available products
-- **Cart** - Shopping cart management
-- **Orders** - Order history and tracking
-- **Admin** - Admin panel with sales dashboard
+### Frontend
 
-## Image Licensing
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev        # http://localhost:3000
+```
 
-Product images used in this project are sourced from [Unsplash](https://unsplash.com) under the [Unsplash License](https://unsplash.com/license), which permits free use for commercial and non-commercial purposes without attribution (though credit is appreciated).
+### Base de datos
 
-Images are uploaded and served via Cloudinary. The Cloudinary URL does not reflect the original source, so this section documents the licensing for transparency and compliance.
+```bash
+cd backend
+npm run migrate    # Ejecuta migraciones pendientes
+npm run seed       # Carga datos de demo
+```
 
-- **Source:** [Unsplash](https://unsplash.com)
-- **License:** https://unsplash.com/license (free for commercial use, no attribution required)
+## 📦 Deploy
+
+### Backend — Render
+
+1. Conectar repo en [Render](https://render.com)
+2. Crear **Web Service** usando `render.yaml` (Blueprints) o manual:
+   - **Root Directory:** `backend`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Health Check Path:** `/`
+3. Configurar variables de entorno en el dashboard de Render:
+   - `DATABASE_URL` — tu string de conexión de Neon
+   - `JWT_SECRET` — generar con `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`
+   - `JWT_REFRESH_SECRET` — otro secret distinto
+   - `CORS_ORIGIN` — URL del frontend en Vercel (ej. `https://el-paraiso.vercel.app`)
+   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+
+### Frontend — Vercel
+
+1. Conectar repo en [Vercel](https://vercel.com)
+2. Configurar:
+   - **Framework:** Vite
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+3. Variable de entorno en Vercel:
+   - `VITE_BACKEND_API_URL` — URL del backend en Render
+
+## 📝 Variables de entorno
+
+### Backend (`backend/.env`)
+
+| Variable | Descripción | Default |
+|---|---|---|
+| `DATABASE_URL` | String de conexión Neon.tech | — |
+| `PORT` | Puerto del servidor | `4000` |
+| `JWT_SECRET` | Firma de access tokens | — |
+| `JWT_REFRESH_SECRET` | Firma de refresh tokens | — |
+| `JWT_ACCESS_EXPIRATION` | Duración access token | `1h` |
+| `JWT_REFRESH_EXPIRATION` | Duración refresh token | `7d` |
+| `CORS_ORIGIN` | Orígenes permitidos (separados por coma) | Vacío = todos |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | — |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | — |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | — |
+| `SEED_FORCE_IMAGES` | Re-subir imágenes al seed | `0` |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Descripción | Default |
+|---|---|---|
+| `VITE_BACKEND_API_URL` | URL del backend API | `http://localhost:4000` |
+
+## 🔧 Scripts disponibles
+
+### Backend
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor con nodemon (hot reload) |
+| `npm start` | Iniciar servidor en producción |
+| `npm run seed` | Cargar datos de demo |
+| `npm run migrate` | Ejecutar migraciones pendientes |
+| `npm run hash-passwords` | Hashear contraseñas existentes |
+
+### Frontend
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Previsualizar build |
 
 ---
 
-## Development Technologies
-
-- ESLint - Code linting
-- TypeScript ESLint - Specific rules for TypeScript
-- PostCSS - CSS processing
-- Autoprefixer - Automatic CSS prefixes
-
----
-
-Developed with love
+Desarrollado por Francis Esculpi
