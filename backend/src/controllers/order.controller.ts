@@ -32,11 +32,21 @@ export const orderController = {
 
   async getOrders(req: Request, res: Response): Promise<void> {
     try {
-      const { status, page, limit } = req.query;
+      const { status, page, limit, search, fechaDesde, fechaHasta, minTotal, maxTotal } = req.query;
       const pageNumber = page ? parseInt(page as string, 10) : undefined;
       const limitNumber = limit ? parseInt(limit as string, 10) : undefined;
 
-      const { orders, totalCount } = await orderService.listAllOrders(status as string | undefined, pageNumber, limitNumber);
+      const filters = {
+        search: search as string | undefined,
+        fechaDesde: fechaDesde as string | undefined,
+        fechaHasta: fechaHasta as string | undefined,
+        minTotal: minTotal ? Number(minTotal) : undefined,
+        maxTotal: maxTotal ? Number(maxTotal) : undefined,
+      };
+
+      const { orders, totalCount } = await orderService.listAllOrders(
+        status as string | undefined, pageNumber, limitNumber, filters
+      );
       res.json({ orders, totalCount });
     }
     catch (error: unknown) {

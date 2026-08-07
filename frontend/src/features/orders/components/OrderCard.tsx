@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Order } from '../types';
 import { Card } from '../../../shared/components/iu';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 import { OrderTimeline } from './OrderTimeline';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getOrderDetails } from '../services/order.service';
@@ -53,10 +54,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order: initialOrder }) => 
         {isExpanded && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 animate-fade-in-down">
             {loading ? (
-              <div className="flex items-center justify-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-                <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando detalles...</p>
-              </div>
+              <SkeletonLoader variant="card" />
             ) : (
               <>
                 <h4 className="font-semibold mb-2">Detalles del Pedido:</h4>

@@ -22,7 +22,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img 
             className="w-full h-40 sm:h-48 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
             src={product.imageUrl} 
-            alt={product.name} 
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-40 sm:h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

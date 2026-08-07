@@ -4,6 +4,7 @@ import { ProductForm } from '../../products/components/ProductForm';
 import { getProductos, deleteProduct } from '../../products/services/product.service';
 import { useCategories } from '../../products/hooks/useCategories';
 import { Package, Pencil, Trash2, Search, Plus } from 'lucide-react';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 
 interface Product {
   id: string;
@@ -134,10 +135,7 @@ export const AdminProducts: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando productos...</p>
-        </div>
+        <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
         <div className="text-center py-8 text-red-600">
           <p>{error}</p>
@@ -175,6 +173,8 @@ export const AdminProducts: React.FC = () => {
                       <img
                         src={product.imageUrl}
                         alt={product.nombre}
+                        loading="lazy"
+                        decoding="async"
                         className="w-10 h-10 rounded object-cover"
                       />
                     ) : (

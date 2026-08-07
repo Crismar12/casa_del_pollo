@@ -5,6 +5,7 @@ import { useOrders } from '../../orders/hooks/useOrders';
 import { ORDER_STATUS, CANCEL_REASONS, getCancelReasonLabel, type Order, type OrderStatus } from '../../orders/types/order.types';
 import { getOrderDetails } from '../../orders/services/order.service';
 import { Button } from '../../../shared/components/iu';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 import { formatDateLocal, formatDateTimeLocal } from '../../../shared/utils/dateUtils';
 import { exportOrderToPdf } from './ExportOrderPdf';
 
@@ -89,7 +90,7 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
     setCancelReason(null);
   };
 
-  if (loading) return <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6">Cargando pedidos...</div>;
+  if (loading) return <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6"><SkeletonLoader variant="table-row" count={3} /></div>;
   if (error) return <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 text-red-500">Error: {error}</div>;
 
   return (

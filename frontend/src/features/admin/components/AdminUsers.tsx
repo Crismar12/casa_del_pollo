@@ -3,6 +3,7 @@ import { Modal } from './Modal';
 import { UserForm } from './UserForm';
 import { authService } from '../../auth/services/auth.service';
 import { Users, Pencil, Power, PowerOff, Search, Plus } from 'lucide-react';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 import { useAuth } from '../../../shared/hooks/useAuth';
 import type { Usuario } from '../../../shared/types/usuario.types';
 
@@ -99,10 +100,7 @@ export const AdminUsers: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando usuarios...</p>
-        </div>
+        <SkeletonLoader variant="table-row" count={4} />
       ) : error ? (
         <div className="text-center py-8 text-red-600">
           <p>{error}</p>

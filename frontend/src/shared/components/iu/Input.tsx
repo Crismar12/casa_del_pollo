@@ -46,8 +46,9 @@ export const Input: React.FC<InputProps> = ({
         name={name}
         required={required}
         className={inputClasses}
+        aria-invalid={error ? 'true' : undefined}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-1" role="alert" aria-live="polite">{error}</p>}
     </div>
   );
 };

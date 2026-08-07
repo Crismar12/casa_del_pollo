@@ -233,6 +233,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onProductSave
               <img
                 src={imgUrl}
                 alt="Vista previa"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-40 object-contain rounded-md border border-gray-200 dark:border-gray-700"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;

@@ -59,10 +59,10 @@ export const createOrder = async (cartItems: CartItem[], clientInfo: { clientId:
   }
 };
 
-export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit?: number): Promise<{ orders: Order[], totalCount: number }> => {
+export const getOrders = async (statusFilter?: OrderStatus, page?: number, limit?: number, extraParams?: Record<string, string | number | undefined>): Promise<{ orders: Order[], totalCount: number }> => {
   try {
     const response = await apiClient.get<{ orders: BackendOrder[], totalCount: number }>("/api/orders", {
-      params: { status: statusFilter, page, limit },
+      params: { status: statusFilter, page, limit, ...extraParams },
     });
 
     
