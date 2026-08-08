@@ -45,7 +45,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ onResetComplete }) => {
             Restablecer datos
           </button>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-amber-700 dark:text-amber-300">¿Borrar todo y recargar?</span>
             <button
               onClick={handleReset}
