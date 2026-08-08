@@ -25,9 +25,9 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
   }[type];
 
   const textColor = {
-    success: 'text-green-800',
-    error: 'text-red-800',
-    info: 'text-blue-800',
+    success: 'text-green-800 dark:text-green-300',
+    error: 'text-red-800 dark:text-red-300',
+    info: 'text-blue-800 dark:text-blue-300',
   }[type];
 
   return (
