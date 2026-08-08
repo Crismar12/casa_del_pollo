@@ -19,15 +19,15 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
   }[type];
 
   const bgColor = {
-    success: 'bg-green-50 dark:bg-green-900/30',
-    error: 'bg-red-50 dark:bg-red-900/30',
-    info: 'bg-blue-50 dark:bg-blue-900/30',
+    success: 'bg-green-50 dark:bg-green-800 border border-green-200 dark:border-green-600',
+    error: 'bg-red-50 dark:bg-red-800 border border-red-200 dark:border-red-600',
+    info: 'bg-blue-50 dark:bg-blue-800 border border-blue-200 dark:border-blue-600',
   }[type];
 
   const textColor = {
-    success: 'text-green-800',
-    error: 'text-red-800',
-    info: 'text-blue-800',
+    success: 'text-green-800 dark:text-green-300',
+    error: 'text-red-800 dark:text-red-300',
+    info: 'text-blue-800 dark:text-blue-300',
   }[type];
 
   return (
@@ -47,7 +47,7 @@ export const Notification: React.FC<NotificationProps> = ({ show, message, type,
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className={`pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-xl border ${bgColor} border-opacity-60`}>
+          <div className={`pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg shadow-xl ${bgColor}`}>
             <div className="p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">{icon}</div>
