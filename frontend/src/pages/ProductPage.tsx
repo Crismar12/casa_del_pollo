@@ -17,12 +17,6 @@ export const ProductPage = () => {
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">Nuestro Menú</h1>
       <div className="flex flex-wrap gap-2 mb-4">
-        {categoriesLoading && (
-          <div className="flex items-center justify-center py-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 dark:border-gray-100"></div>
-            <p className="ml-2 text-gray-600 dark:text-gray-400 text-sm">Cargando categorías...</p>
-          </div>
-        )}
         {categoriesError && (
           <div className="text-center py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg px-3 text-sm">
             <p>Error al cargar categorías: {categoriesError}</p>

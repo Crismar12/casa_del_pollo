@@ -1,6 +1,7 @@
 import { TarjetaDashboard, PedidosRecientes, ProductosMasVendidos, ResumenSemanal, AdminProducts, AdminCategories, AdminUsers, DemoBanner } from '../features/admin/components';
 import React, { useState, useCallback } from 'react';
 import { useDashboardSummary } from '../features/admin/hooks/useDashboardSummary';
+import { SkeletonLoader } from '../shared/components/iu/SkeletonLoader';
 import { RefreshCw, LayoutDashboard, Package, Tag, Users, Info } from 'lucide-react';
 
 type TabType = 'dashboard' | 'productos' | 'categorias' | 'usuarios';
@@ -30,8 +31,12 @@ export const AdminPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p>Cargando resumen del dashboard...</p>
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <div className="flex items-center mb-6">
+          <div className="h-8 w-56 animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
+        </div>
+        <SkeletonLoader variant="card" count={3} />
+        <SkeletonLoader variant="chart" />
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProductCard } from './ProductCard';
 import { useProducts } from "../hooks/useProducts";
+import { SkeletonLoader } from "../../../shared/components/iu/SkeletonLoader";
 
 interface ProductListProps {
   selectedCategoryId?: string;
@@ -11,9 +12,8 @@ export const ProductList: React.FC<ProductListProps> = ({ selectedCategoryId }) 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-10">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-        <p className="ml-3 text-gray-600 dark:text-gray-400 text-lg">Cargando productos...</p>
+      <div className="py-6">
+        <SkeletonLoader variant="card" count={4} />
       </div>
     );
   }

@@ -179,9 +179,8 @@ export const PedidosRecientes: React.FC<PedidosRecientesProps> = ({
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         {modalLoading ? (
-          <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-            <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando detalles del pedido...</p>
+          <div className="py-4">
+            <SkeletonLoader variant="card" />
           </div>
         ) : (
           selectedOrder && (

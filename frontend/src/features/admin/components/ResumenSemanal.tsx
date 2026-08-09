@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useWeeklySalesSummary } from '../hooks/useWeeklySalesSummary';
+import { SkeletonLoader } from '../../../shared/components/iu/SkeletonLoader';
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) => {
   if (!active || !payload || !payload.length) return null;
@@ -17,9 +18,8 @@ export const ResumenSemanal: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 flex items-center justify-center h-80">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
-        <p className="ml-3 text-gray-600 dark:text-gray-400">Cargando resumen semanal...</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/40 p-6 h-80">
+        <SkeletonLoader variant="chart" />
       </div>
     );
   }
