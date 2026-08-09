@@ -1,6 +1,13 @@
 # 🐔 El Paraíso del Pollo — Gestor de Pedidos
 
+https://paraiso-del-pollo.vercel.app/
+
 Sistema de gestión de pedidos para restaurante desarrollado con React, TypeScript, Express, PostgreSQL (Neon.tech) y Cloudinary.
+
+<img width="1852" height="852" alt="paraiso_pollo" src="https://github.com/user-attachments/assets/978c2d12-e24b-41a4-a923-3a0ea52357db" />
+
+<img width="1456" height="781" alt="paraiso_pollo2" src="https://github.com/user-attachments/assets/766fb437-26cd-4850-bab1-1dd3202ce336" />
+
 
 ## 🚀 Demo
 
