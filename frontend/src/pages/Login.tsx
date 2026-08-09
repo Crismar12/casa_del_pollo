@@ -5,6 +5,7 @@ import React from 'react';
 import { Input } from '../shared/components/iu';
 import { Button } from '../shared/components/iu';
 import { useAuth } from '../shared/hooks/useAuth'; 
+import { RefreshCw } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function Login() {
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
   const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
   const [generalError, setGeneralError] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const { login } = useAuth(); 
@@ -36,6 +38,7 @@ export default function Login() {
       return;
     }
 
+    setLoading(true);
     try {
       await login(email, password); 
       showNotification('¡Bienvenido!', 'success');
@@ -43,6 +46,8 @@ export default function Login() {
     } catch (error: unknown) {
       console.error('Error en la página de login:', error);
       setGeneralError('Correo o contraseña incorrectos.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,9 +87,17 @@ export default function Login() {
           <Button
             type="submit"
             gradient={true}
-            className="w-full py-2 rounded-lg font-bold shadow-md dark:shadow-gray-900/40"
+            disabled={loading}
+            className="w-full py-2 rounded-lg font-bold shadow-md dark:shadow-gray-900/40 disabled:opacity-70"
           >
-            Ingresar
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Ingresando...
+              </span>
+            ) : (
+              'Ingresar'
+            )}
           </Button>
         </form>
 
